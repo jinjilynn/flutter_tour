@@ -146,9 +146,8 @@
       ),
       )
       ```
-  ```
     
-  - 按钮
+- 按钮
   
     - 关于
       - from material.dart
@@ -254,7 +253,6 @@
     - repeat
         - 图片本身大小小于显示空间时，指定图片的重复规则
       - 类型 ImageRepeat
-  ```
   
 - 字体图标
   
@@ -295,9 +293,6 @@
           fonts:
               - asset: fonts/iconfont.ttf
         ```
-      ```
-      
-      ```
   
     - 在fontFamily中指定相应的字体
   
