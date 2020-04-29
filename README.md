@@ -104,9 +104,6 @@
               fonts:
                   - asset: assets/fonts/abrilfatface/AbrilFatface-Regular.ttf
           ```
-    ```
-        
-    ```
       
       - 在TextStyle中使用
       
@@ -115,9 +112,6 @@
           fontFamily: 'Raleway',
           );
           ```
-        ```
-        
-        ```
   
 - DefaultTextStyle
   
