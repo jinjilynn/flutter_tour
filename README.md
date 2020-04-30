@@ -199,7 +199,7 @@
         - icon颜色
           - 类型 Color
       - onPressed
-  
+    
   - 图片
   
     - 加载并显示图片，图片的数据源可以是asset、文件、内存以及网络
@@ -692,8 +692,11 @@
     - ##### Column
     
       - from widgets.dart
+    
   - 垂直方向上的线形布局,主轴为垂直方向,辅轴为水平方向
+    
       - 只是一列,溢出会报错,并不会自动换列
+      
   - 参数 
         - 同 Row的参数
     
@@ -742,6 +745,7 @@
       - 布局并不会尽可能的在主轴方向上占据最大的空间,在主轴和辅轴上的空间都是内容空间大小
       - 主轴上的空间是与在主轴方向上空间最大的run一样
       - 辅轴上的空间是各个run和runSpacing之和
+      - 流失布局和线形布局不一样的是可以超出边界但不报错,超出部分不可见
       - 参数
         - direction
           - 设置主轴方向
@@ -809,10 +813,113 @@
         - children
           - 子组件
           - 类型
-            - List<Widget>
-  
-    - #### Flow
-  
+          - List<Widget>
+    
+  - #### Flow
+    
       - from widgets.dart
       - 自定义实现布局
       - 暂时略...
+    
+  - #### 层叠布局
+  
+    - 类 Stack
+  
+    - from widgets.dart
+  
+    - 处在Stack中的子元素都是绝对定位状态
+  
+    - Stack的宽高等于最大子元素的宽高,即内容宽高
+  
+    - 默认都是在Stack的左上角堆叠即topStart,除非使用Positioned组件进行了定位
+  
+    - 没有z-index的概念,堆叠顺序依靠在Stack中出现的先后决定,后面子组件的覆盖在前面的子组件上面
+  
+    - 内容可以溢出并不会报错
+  
+    - 参数
+  
+      - alignment
+  
+        - 设置默认的对齐方式,只会对没有使用Positioned的子组件或者使用了Positioned的子组件但只是指定了部分设置(只指定了left、right、bottom、top中的某一个)的子组件有作用
+        - 类型
+          - AlignmentDirectional
+            - topStart
+            - topCenter
+            - topEnd
+            - centerStart
+            - center
+            - centerEnd
+            - bottomStart
+            - bottomCenter
+            - bottomEnd
+          - 默认
+            - topStart
+  
+      - textDirection
+  
+        - 设置alignment在水平方向上的的参考系
+        - 类型
+          - TextDirection
+            - ltr
+            - rtl
+  
+      - fit
+  
+        - 设置没有使用Positioned的子元素的大小
+        - 类型
+          - StackFit
+            - loose
+              - 使用子组件自己的大小
+            - expand
+              - 使用Stack的大小,即铺满Stack
+            - passthrough
+              - 使用继承的大小
+          - 默认值
+            - loose
+  
+      - overflow
+  
+        - 设置内容溢出时是否会被截掉
+        - 类型
+          - Overflow
+            - visible
+            - clip
+          - 默认值
+            - clip
+        
+      - children
+        - 子元素
+        - 类型
+      - List<Widget>
+    - Positioned
+      - 只在Stack中才有意义
+      
+      - 用于设置Stack中子组件的定位位置
+      
+      - 参数
+        - left
+          - 类型
+            - double
+        - right
+          - 类型
+            - double
+        - top
+          - 类型
+            - double
+        - bottom
+          - 类型
+            - double
+        - width
+          - 设置Stack子组件的宽度约束,如果Positioned中的child超出范围则超出部分不可见
+          - 类型
+            - double
+        - height
+          - 设置Stack子组件的高度约束,如果Positioned中的child超出范围则超出部分不可见
+          - 类型
+            - double
+      - 没有指定到的定位属性会被alignment相应方向上的值覆盖
+      
+      - 不能同时指定left、width、right这三个参数,你细品
+        
+        
