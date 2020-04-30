@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/stack.dart';
+import 'package:flutter_demo/align.dart';
+// import 'package:flutter_demo/stack.dart';
 // import 'package:flutter_demo/column.dart';
 // import 'package:flutter_demo/flex.dart';
 // import 'package:flutter_demo/wrap.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home:
-          Scaffold(appBar: AppBar(title: Text('hello')), body: StackDemo()),
+          Scaffold(appBar: AppBar(title: Text('hello')), body: AlignDemo()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }

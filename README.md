@@ -2,21 +2,20 @@
 
 ## Widget
 
--  #### 基础 Widgets
+- 基础widget定义在widgets.dart中,Meterial和Cupertino中都可以使用的
 
-  - 基础widget定义在widgets.dart中,Meterial和Cupertino中都可以使用的
+  - Text
+  - Image
+  - Icon
+  - Form
+  - Row
+  - Column
+  - Flex
+  - Wrap
+  - Stack
+  - Align
+  - Container
 
-    - Text
-    - Image
-    - Icon
-    - Form
-    - Row
-    - Column
-    - Flex
-    - Wrap
-    - Stack
-    - Container
-  
 - 文本
   
   - from widgets.dart
@@ -821,7 +820,7 @@
       - 自定义实现布局
       - 暂时略...
     
-  - #### 层叠布局
+  - #### 层叠布局(绝对定位)
   
     - 类 Stack
   
@@ -918,8 +917,65 @@
           - 设置Stack子组件的高度约束,如果Positioned中的child超出范围则超出部分不可见
           - 类型
             - double
+        
       - 没有指定到的定位属性会被alignment相应方向上的值覆盖
       
       - 不能同时指定left、width、right这三个参数,你细品
-        
-        
+    
+  - #### 单个子节点快速定位
+    
+    - from widgets.dart
+      
+    - 类:Align
+    
+    - 快速定位的第一步是要有多余的空间可以去定位,所以Align的空间是撑满父容器的
+    
+    - 里面的子组件如果溢出了的话不会报错,益处的部分不会被截取掉
+    
+    - 一次只能定位一个组件,即只有child
+    
+    - 参数
+    
+        - alignment
+            - 设置子元素的对齐方式
+            - 类型
+                - AlignmentGeometry
+                    - Alignment
+                        - 设置子组件中心点的绘制位置
+                        - 参考坐标系原点为Align容器的中心点
+                        - 子组件中心点位置计算
+                            - 1个单位代表把子元素在x或y方向上定位到最边上是子元素中心点到Align中心点到距离
+                                - x = 1 代表 Align.width / 2 - child.width / 2
+                                - y = 1 代表 Align.height / 2 - child.height / 2
+                        - 静态常量
+                            - Alignment.topLeft
+                            - Alignment.topCenter
+                            - Alignment.topRight
+                            - Alignment.centerLeft
+                            - Alignment.center
+                            - Alignment.centerRight
+                            - Alignment.bottomLeft
+                            - Alignment.bottomRight
+                            - Alignment.bottomCenter
+                        - 参数
+                            - x
+                            - y
+                        - 子类: FractionalOffset
+                            - 设置子组件中心点的绘制位置
+                            - 参考坐标系原点为Align容器左上角
+        - widthFactor
+            - 设置定位容器的宽度系数,child.width * widthFactor,默认总是会撑满父容器
+            - 只有在RenderObject中BoxConstrnints的w和h属性是个范围时才会起作用,w=或者h=就不会起作用了
+            - 类型
+                - double
+        - heightFactor
+            - 设置定位容器的高度系数,child.height * heightFactor,默认总是会撑满父容器
+            - 只有在RenderObject中BoxConstrnints的w和h属性是个范围时才会起作用,w=或者h=就不会起作用了
+            - 类型
+                - double
+    - Center 
+      - Align的子类
+    
+      - 就是alignment设置为center的快捷方式
+      
+          
