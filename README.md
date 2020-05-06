@@ -995,50 +995,28 @@
     - 参数
   
       - padding
-  
         - 必填
-  
         - 类型
-  
           - EdgeInsetsGeometry
-  
-            - 子类 EdgeInsets
-  
-              - 设置内边距
-  
-              - EdgeInsets.fromLTRB(this.left, this.top, this.right, this.bottom)
-  
-              - EdgeInsets.all(double value)
-  
-              - EdgeInsets.only({
-  
+              - 子类 EdgeInsets
+                - 设置内边距
+                - EdgeInsets.fromLTRB(this.left, this.top, this.right, this.bottom)
+                - EdgeInsets.all(double value)
+                - EdgeInsets.only({
                 ​    this.left = 0.0,
-  
                 ​    this.top = 0.0,
-  
                 ​    this.right = 0.0,
-  
                 ​    this.bottom = 0.0,
-  
                   })
-  
-              -       EdgeInsets.symmetric({
-  
+                - EdgeInsets.symmetric({
                       ​    double vertical = 0.0,
-  
                       ​    double horizontal = 0.0,
-  
                         }) : left = horizontal,
-  
                       ​       top = vertical,
-  
                       ​       right = horizontal,
-  
                       ​       bottom = vertical;
-  
       - child
-  
-        -       子元素
+        - 子元素
   
   - 设置盒子约束
   
