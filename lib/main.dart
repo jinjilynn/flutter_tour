@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/align.dart';
+// import 'package:flutter_demo/constrainedBox.dart';
+import 'package:flutter_demo/decoratedbox.dart';
+// import 'package:flutter_demo/padding.dart';
+//import 'package:flutter_demo/align.dart';
 // import 'package:flutter_demo/stack.dart';
 // import 'package:flutter_demo/column.dart';
 // import 'package:flutter_demo/flex.dart';
@@ -21,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home:
-          Scaffold(appBar: AppBar(title: Text('hello')), body: AlignDemo()),
+          Scaffold(appBar: AppBar(title: Text('Learning')), body: DecoratedBoxDemo()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }

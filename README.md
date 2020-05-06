@@ -13,6 +13,9 @@
   - Flex
   - Wrap
   - Stack
+  - ConstrainedBox
+  - UnconstrainedBox
+  - DecoratedBox
   - Align
   - Container
 
@@ -25,6 +28,8 @@
   - 类:Text
   
   - 默认fontSize为14
+  
+  - 如果没有显式或明确设置constraints,则Text盒子的宽高就是内容宽高
   
     - 常用参数
   
@@ -820,7 +825,7 @@
       - 自定义实现布局
       - 暂时略...
     
-  - #### 层叠布局(绝对定位)
+  - #### 绝对定位
   
     - 类 Stack
   
@@ -921,8 +926,9 @@
       - 没有指定到的定位属性会被alignment相应方向上的值覆盖
       
       - 不能同时指定left、width、right这三个参数,你细品
-    
-  - #### 单个子节点快速定位
+  
+- ### 样式Widget
+  - 对齐方式
     
     - from widgets.dart
       
@@ -977,5 +983,253 @@
       - Align的子类
     
       - 就是alignment设置为center的快捷方式
-      
+    
+  - 内边距
+  
+    - 类 Padding
+  
+    - from widgets.dart
+  
+    - 为其子节点添加padding
+  
+    - 参数
+  
+      - padding
+  
+        - 必填
+  
+        - 类型
+  
+          - EdgeInsetsGeometry
+  
+            - 子类 EdgeInsets
+  
+              - 设置内边距
+  
+              - EdgeInsets.fromLTRB(this.left, this.top, this.right, this.bottom)
+  
+              - EdgeInsets.all(double value)
+  
+              - EdgeInsets.only({
+  
+                ​    this.left = 0.0,
+  
+                ​    this.top = 0.0,
+  
+                ​    this.right = 0.0,
+  
+                ​    this.bottom = 0.0,
+  
+                  })
+  
+              -       EdgeInsets.symmetric({
+  
+                      ​    double vertical = 0.0,
+  
+                      ​    double horizontal = 0.0,
+  
+                        }) : left = horizontal,
+  
+                      ​       top = vertical,
+  
+                      ​       right = horizontal,
+  
+                      ​       bottom = vertical;
+  
+      - child
+  
+        -       子元素
+  
+  -       设置盒子约束
+  
+          - 类  ConstrainedBox
+          - from widgets.dart
+          - 所有可视的widget都必定会有一个盒约束
+          - 为其子节点的盒子添加盒子边界约束
+          - 这个约束会被所有子孙widget继承
+          - 当一个widget继承了多个BoxConstraints时,在某一边会取最大值
+          - 参数
+            -       constraints
+                    -       必填
+                    -       设置约束边界
+                    -       类型
+                            -       BoxConstraints
+                                    -       设置盒子边界约束
+                                    -       参数
+                                            -       minWidth
+                                                    -       最小宽度
+                                                    -       类型 double
+                                                    -       默认0
+                                            -       maxWidth
+                                                    -       最大宽度
+                                                    -       类型 double
+                                                    -       默认 double.infinity
+                                            -       minHeight
+                                                    -       最小高度
+                                                    -       类型 double
+                                                    -       默认0
+                                            -       maxHeight
+                                                    -       最大高度
+                                                    -       类型 double
+                                                    -       默认 double.infinity
+                                    -       命名构造方法
+                                            -       BoxConstraints.tight
+                                            -       BoxConstraints.loose
+                                            -       BoxConstraints.expand
+            -       child
+                    -       子元素
+          - SizeBox
+            - 一种特殊情况,相当于BoxConstraints.tight
           
+  - 取消继承约束
+  
+    - 类 UnconstrainedBox
+    - from widgets.dart
+    - 取消子元素中从父节点及以上继承下来的盒约束
+    - 取消约束的实质就是为子元素设置唯一约束 0 <= width <= infinity; 0 <= height <= infinity;
+    - 虽然子元素没有继承来自父节点的所有约束,但是UnconstrainedBox本身是继承了约束的
+    - 参数
+      - child
+      - textDirection
+      - alignment
+        - 类型
+          - Alignment
+            - topLeft
+            - topCenter
+            - topRight
+            - centerLeft
+            - center
+            - centerRight
+            - bottomLeft
+            - bottomCenter
+            - bottomRight
+      - constrainedAxis
+        - 设置在某一个方向上重新继承来自父节点的约束
+        - 类型
+          - Axis
+            - horizontal
+            - vertical
+  
+  - 设置盒子样式
+  
+    - 类 DecoratedBox
+  
+    - from widgets.dart
+  
+    - 可以设置盒子的样式有
+  
+      - 背景颜色、背景图片
+  
+        - 如何渐变
+        - 形状
+        - 混合
+  
+      - 边框
+  
+      - 圆角
+  
+      - 阴影
+    - 参数
+      - child
+        
+        - 子元素
+        
+      - decoration
+        
+        - 设置样式
+        - 类型BoxDecoration
+      - 参数
+            - color
+          - 设置盒子的背景填充颜色
+              - 类型
+                - Color
+            - image
+              - 设置盒子的背景填充图案,会填充在背景色上面
+              - 类型
+                - DecorationImage
+                  - image
+                    - 必填
+                    - 类型
+                      - ImageProvider
+            - gradient
+              - 设置盒子的背景填充渐变色,与背景色互斥
+              - 类型
+                - LinearGradient
+                  - 参数
+                    - begin
+                    - end
+                    - colors
+                    - stops
+                - RadialGradient
+            - backgroundBlendMode
+              - 设置背景色或者背景渐变色与盒子的融合方式
+              - 类型
+                - BlendMode
+            - shape
+              - 设置背景色、背景渐变色、填充图片的裁剪形状
+              - 与borderRadius互斥
+              - 类型
+                - 枚举
+                - BoxShape
+                  - rectangle
+                  - circle
+            - border
+              - 设置盒子的边框,边框会绘制在背景之上
+              - 类型
+                - Border
+                  - 参数
+                    - top
+                      - 类型
+                        - BorderSide
+                          - 参数
+                            - color
+                            - width
+                            - style
+                    - right
+                    - bottom
+                    - left
+                  - 命名构造函数
+                    - Border.all
+                    - Border.fromBorderSide
+            - borderRadius
+              - 设置盒子的圆角
+              - 如果设置了radius,那么border就不能存在只设置小于4个边的情况
+              - 如果设置了radius,那么就不能再设置shape
+              - 类型
+                - BorderRadius
+                  - 只有命名构造函数
+                    - BorderRadius.all
+                      - 参数
+                        - radius
+                          - 类型
+                            - Radius
+                              - Radius.circular
+                                - x和y方向上弧度一样
+                                - 类型 double
+                              - Radius.elliptical
+                                - x和y方向上不同的弧度
+                                - 参数
+                                  - 类型 double
+                                  - 类型 double
+            - boxShadow
+              - 设置盒子阴影
+              - 类型
+                - List<BoxShadow> 
+                  - BoxShadow
+                    - 参数
+                      - color
+                      - offset
+                      - blurRadius
+        
+      - position
+        - 样式设置的位置,是在子元素的前面还是在子元素的后面
+        - 类型
+          - DecorationPosition
+          - background
+            - foreground
+  - 变形
+    - 
+      
+        
+      
+        

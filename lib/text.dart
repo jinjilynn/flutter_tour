@@ -4,7 +4,8 @@ class TextDemo extends StatelessWidget {
   const TextDemo({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return //Text('text');
+    Container(
       // child: Text(
       //       'this is a text' * 2,
       //        textAlign: TextAlign.right,
@@ -35,27 +36,35 @@ class TextDemo extends StatelessWidget {
       // ]),
       // textAlign: TextAlign.right,
       // )
-      child: DefaultTextStyle(
-          //1.设置文本默认样式  
-          style: TextStyle(
-            color:Colors.red,
-            fontSize: 20.0,
-          ),
-          textAlign: TextAlign.start,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text("hello world"),
-              Text("I am Jack"),
-              Text("I am Jack",
-                style: TextStyle(
-                  inherit: false, //2.不继承默认样式
-                  color: Colors.grey
-                ),
-              ),
-            ],
-          ),
-        )
+      // child: DefaultTextStyle(
+      //     //1.设置文本默认样式  
+      //     style: TextStyle(
+      //       color:Colors.red,
+      //       fontSize: 20.0,
+      //     ),
+      //     textAlign: TextAlign.start,
+      //     child: Column(
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: <Widget>[
+      //         Text("hello world"),
+      //         Text("I am Jack"),
+      //         Text("I am Jack",
+      //           style: TextStyle(
+      //             inherit: false, //2.不继承默认样式
+      //             color: Colors.grey
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   )
+       width:400,
+       height:300,
+      child:Text(
+        '李奇峯', 
+        textAlign: TextAlign.center, 
+        textDirection: TextDirection.ltr,
+        style:TextStyle(color:Colors.black,fontSize:80)
+      )
     );
   }
 }
