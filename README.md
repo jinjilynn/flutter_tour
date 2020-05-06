@@ -1040,44 +1040,44 @@
   
         -       子元素
   
-  -       设置盒子约束
+  - 设置盒子约束
   
-          - 类  ConstrainedBox
-          - from widgets.dart
-          - 所有可视的widget都必定会有一个盒约束
-          - 为其子节点的盒子添加盒子边界约束
-          - 这个约束会被所有子孙widget继承
-          - 当一个widget继承了多个BoxConstraints时,在某一边会取最大值
+    - 类  ConstrainedBox
+    - from widgets.dart
+    - 所有可视的widget都必定会有一个盒约束
+    - 为其子节点的盒子添加盒子边界约束
+    - 这个约束会被所有子孙widget继承
+    - 当一个widget继承了多个BoxConstraints时,在某一边会取最大值
+    - 参数
+      - constraints
+        -  必填
+        -  设置约束边界
+        -  类型
+        -  BoxConstraints
+          - 设置盒子边界约束
           - 参数
-            -       constraints
-                    -       必填
-                    -       设置约束边界
-                    -       类型
-                            -       BoxConstraints
-                                    -       设置盒子边界约束
-                                    -       参数
-                                            -       minWidth
-                                                    -       最小宽度
-                                                    -       类型 double
-                                                    -       默认0
-                                            -       maxWidth
-                                                    -       最大宽度
-                                                    -       类型 double
-                                                    -       默认 double.infinity
-                                            -       minHeight
-                                                    -       最小高度
-                                                    -       类型 double
-                                                    -       默认0
-                                            -       maxHeight
-                                                    -       最大高度
-                                                    -       类型 double
-                                                    -       默认 double.infinity
-                                    -       命名构造方法
-                                            -       BoxConstraints.tight
-                                            -       BoxConstraints.loose
-                                            -       BoxConstraints.expand
-            -       child
-                    -       子元素
+            - minWidth
+                -   最小宽度
+                -   类型 double
+                -   默认0
+            - maxWidth
+                -  最大宽度
+                -  类型 double
+                -  默认 double.infinity
+            - minHeight
+                -  最小高度
+                -  类型 double
+                -  默认0
+            - maxHeight
+                -  最大高度
+                -  类型 double
+                -  默认 double.infinity
+            - 命名构造方法
+                - BoxConstraints.tight
+                - BoxConstraints.loose
+                - BoxConstraints.expand
+            - child
+                - 子元素
           - SizeBox
             - 一种特殊情况,相当于BoxConstraints.tight
           
