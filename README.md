@@ -16,6 +16,7 @@
   - ConstrainedBox
   - UnconstrainedBox
   - DecoratedBox
+  - Transform
   - Align
   - Container
 
@@ -1058,7 +1059,7 @@
                 - 子元素
           - SizeBox
             - 一种特殊情况,相当于BoxConstraints.tight
-          
+    
   - 取消继承约束
   
     - 类 UnconstrainedBox
@@ -1107,6 +1108,7 @@
       - 圆角
   
       - 阴影
+      
     - 参数
       - child
         
@@ -1206,8 +1208,57 @@
           - background
             - foreground
   - 变形
-    - 
+    -   类 Transform
+    -   from widgets.dart
+    -   对子元素进行变形
+    -   参数
+        -   transfrom
+            -   必填
+            -   设置child的矩阵变换
+            -   类型
+                -   Matrix4
+                    -   translationValues
+                        -   移动
+                        -   位置参数
+                            -   translateX
+                                -   x方向
+                            -   translateY
+                                -   y方向
+                            -   translateZ = 0
+                    -   rotationX 
+                        -   绕X轴旋转
+                    -   rotationY 
+                        -   绕Y轴旋转
+                    -   rotationZ
+                        -   绕Z轴旋转
+                    -   diagonal3Values
+                        -   设置放大或缩小
+                        -   位置参数
+                            -   scalex
+                            -   scaley
+                            -   scalez = 1
+                    -   skew
+                        -   设置倾斜
+                        -   x
+                            -   水平方向倾斜
+                        -   y
+                            -   垂直方向倾斜
+                    -   skewX
+                        -   水平方向倾斜快捷方式
+                    -   skewY
+                        -   垂直方向倾斜快捷方式
+        -   origin
+            -   设置变形转换原点偏移,相对于原来的原点
+            -   类型
+                -   Offset
+        -   transformHitTests
+            -   设置命中测试时是否执行变形转换
+            -   类型
+                -   bool
+        -   alignment
+            -   设置原点在盒子中的对齐方式
+            -   类型
+                -   Alignment
+    
       
-        
-      
-        
+    
