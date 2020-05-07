@@ -1207,10 +1207,12 @@
           - DecorationPosition
           - background
             - foreground
+    
   - 变形
     -   类 Transform
     -   from widgets.dart
-    -   对子元素进行变形
+    -   对其子元素进行变形
+    -   Transform的变换是应用在绘制阶段，而并不是应用在布局(layout)阶段，所以无论对子组件应用何种变化，其占用空间的大小和在屏幕上的位置都是固定不变的，因为这些是在布局阶段就确定的,但是像RotatedBox这样的就不一样了,这个是在layout阶段固定好的
     -   参数
         -   transfrom
             -   必填
@@ -1259,6 +1261,26 @@
             -   设置原点在盒子中的对齐方式
             -   类型
                 -   Alignment
+                    -   topLeft
+                    -   topCenter
+                    -   topRight
+                    -   centerLeft
+                    -   center
+                    -   centerRight
+                    -   bottomLeft
+                    -   bottomCenter
+                    -   bottomRight
+                -   默认
+                    -   topLeft
+    -   命名构造函数
+        -   Transform.translate
+        -   Transform.scale
+        -   Transform.rotate
+        -   以上这些只是对transform属性赋特殊的值给Matrix4
+    
+  - Container
+    
+    - from widgets.dart
+    - 
     
       
-    
