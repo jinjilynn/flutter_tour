@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/clip.dart';
 // import 'package:flutter_demo/constrainedBox.dart';
 // import 'package:flutter_demo/decoratedbox.dart';
 import 'package:flutter_demo/transform.dart';
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home:
-          Scaffold(appBar: AppBar(title: Text('Learning')), body: TransformDemo()),
+          Scaffold(appBar: AppBar(title: Text('Learning')), body: ClipDemo()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }

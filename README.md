@@ -1278,9 +1278,34 @@
         -   Transform.rotate
         -   以上这些只是对transform属性赋特殊的值给Matrix4
     
+  - 裁剪
+  
+    - 用于对组件进行裁剪
+    - from widgets.dart
+    - ClipOval
+      - 子组件为正方形时剪裁为圆形，为矩形时，剪裁为椭圆
+    - ClipRRect
+      - 将子组件剪裁为圆角矩形
+    - ClipRect
+      - 剪裁子组件到实际占用的矩形大小（溢出部分剪裁）
+    - 每个Clip都有一个clip参数,该参数可以自定义裁剪区域
+  
   - Container
     
     - from widgets.dart
-    - 
+    - Container组件是一个组合容器,并没有自己的renderObject,类似于把ConstrainedBox、DecoratedBox、Transform、Padding、Align、Clip等放到一起的自定义组件
+    - 参数
+      - alignment
+      - padding
+      - color
+      - decoration
+      - foregroundDecoration
+      - width
+      - height
+      - constraints
+      - margin
+      - transform
+      - child
+      - chlipBehavior
     
       
