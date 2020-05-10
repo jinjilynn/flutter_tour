@@ -1,5 +1,8 @@
 # Flutter
 
+![render-pipeline](./render-pipeline.png)
+
+
 ## Widget
 
 - 基础widget定义在widgets.dart中,Meterial和Cupertino中都可以使用的

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo/clip.dart';
 // import 'package:flutter_demo/constrainedBox.dart';
 // import 'package:flutter_demo/decoratedbox.dart';
-import 'package:flutter_demo/transform.dart';
+// import 'package:flutter_demo/transform.dart';
 // import 'package:flutter_demo/padding.dart';
-//import 'package:flutter_demo/align.dart';
+// import 'package:flutter_demo/align.dart';
 // import 'package:flutter_demo/stack.dart';
 // import 'package:flutter_demo/column.dart';
 // import 'package:flutter_demo/flex.dart';
 // import 'package:flutter_demo/wrap.dart';
 // import 'package:flutter_demo/row.dart';
-// import 'package:flutter_demo/form.dart';
+import 'package:flutter_demo/form.dart';
 // import 'package:flutter_demo/radiobutton.dart';
 // import 'package:flutter_demo/button.dart';
 // import 'package:flutter_demo/checkbox.dart';
@@ -19,14 +19,24 @@ import 'package:flutter_demo/transform.dart';
 // import 'package:flutter_demo/imageicon.dart';
 // import 'package:flutter_demo/textfile.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+  MyApp()
+  // DecoratedBox(
+  //   key: GlobalKey(),
+  //   decoration:BoxDecoration(),
+  //   child:Text(
+  //     'helloworld'*1000,
+  //     textDirection: TextDirection.ltr
+  //   )
+  // )
+);
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home:
-          Scaffold(appBar: AppBar(title: Text('Learning')), body: ClipDemo()),
+          Scaffold(appBar: AppBar(title: Text('Learning')), body: FormDemo()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }

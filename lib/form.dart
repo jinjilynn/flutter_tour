@@ -15,6 +15,7 @@ class _FormDemoState extends State<FormDemo> {
       child: Form(
           key: _formKey,
           child: Column(children: <Widget>[
+            Opacity(opacity: null),
             TextFormField(
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
@@ -41,7 +42,7 @@ class _FormDemoState extends State<FormDemo> {
               },
             ),
             Builder(builder: (context) {
-              return RaisedButton(child: Text('登录'), onPressed: () {
+              return RaisedButton(child: Text('登录', textDirection: TextDirection.ltr,), onPressed: () {
                   //print( Form.of(context).validate());
                   (_formKey.currentState as FormState).validate();
               });
