@@ -1,6 +1,42 @@
 # Flutter
 
-![render-pipeline](./render-pipeline.png)
+#### 关于Flutter
+
+Flutter是一个由谷歌开发的开源UI框架，用于为Android、iOS、 Windows、Mac、Linux、Fuchsia开发应用.
+
+![fsen](./images/fsen.png)
+
+Flutter采用自绘引擎方式进行UI渲染,也就是底层会调用OpenGL这种跨平台的绘制引擎直接为GPU提供绘制数据,所以其性能会大于等于原生组件的性能.
+
+自绘引擎的方式会带来两个好处:一个是平台无关性;一个是操作系统版本的无关性.
+
+平台无关性是说在Android、ios、Windows、Mac、Linux、Fushia等操作系统中UI会有良好的一致性体验.这个很好理解,因为各个平台的OpenGL引擎的表现是一致的.
+
+操作系统版本无关性就是各个操作系统的不同版本对UI的绘制几乎没有影响,因为Flutter的UI绘制并不是使用与操作系统版本具有强相关性的组件进行绘制的,也就不会有因为系统升级而导致的组件渲染差异所带来的各种奇奇怪怪的bug困扰.
+
+#### Flutter的渲染机制
+
+因为Flutter是自绘引擎,所以它的渲染机制是和底层的显像原理相关的
+
+![visual](./images/visual.png)
+
+在计算机系统中,显示器显示的图像帧来自于GPU缓存,GPU缓存中的图像帧是GPU计算的结果,GPU计算需要的数据是CPU通过总线传递过来的.
+
+显示器每显示完一帧图像就会发送一个垂直信号(Vsync)给视频控制器,视频控制器就会从GPU缓存中读取下一帧图像并传递给显示器显示,如果一个显示器是60hz的刷新频率,也就是说这个显示器每秒会发送60次这样的垂直信号(Vsync).
+
+所以Flutter渲染所关注的就是在下一次垂直信号到来之前(两次Vsync之间)尽可能快的计算出下一帧图像数据并交给GPU.
+
+也就是说Flutter的渲染动作是依靠垂直信号来驱动的(如下图)
+
+![vsync](./images/flutter_draw.png)
+
+显示器发送的垂直同步信号(Vsync)被GPU传递到UI线程里,UI线程里的Dart运行时接受到Vsync后会进行一个被称为渲染流水线的处理过程来生成一种叫Layer Tree图像数据,Layer Tree再被送到GPU线程里(期间可能会经过多次硬件加速处理)供Skia引擎处理成GPU可使用的数据,这些数据最后经由OpenGL送给GPU进行渲染成帧,并最终由视频控制器交给显示器显示.
+
+#### 渲染流水线
+
+
+
+![render-pipeline](./images/render-pipeline.png)
 
 
 ## Widget
