@@ -15,7 +15,7 @@ class _FormDemoState extends State<FormDemo> {
       child: Form(
           key: _formKey,
           child: Column(children: <Widget>[
-            Opacity(opacity: null),
+            // Opacity(opacity: null),
             TextFormField(
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),

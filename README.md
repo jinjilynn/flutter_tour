@@ -56,7 +56,7 @@ Window类中提供了屏幕尺寸、事件回调、图形绘制接口以及其�
 
 ![vsync](./images/flutter_draw.png)
 
-显示器发送的垂直同步信号(Vsync)被GPU传递到UI线程里,UI线程里的Dart运行时接受到Vsync后会进行一个被称为渲染流水线的处理过程来生成一种叫Layer Tree图像数据,Layer Tree再被送到GPU线程里(期间可能会经过多次硬件加速处理)供Skia引擎处理成GPU可使用的数据,这些数据最后经由OpenGL送给GPU进行渲染成帧,并最终由视频控制器交给显示器显示.
+显示器发送的垂直同步信号(Vsync)被GPU传递到UI线程里,UI线程里的Dart运行时接受到Vsync后会进行一个被称为渲染流水线的处理过程来生成一种叫Layer Tree图像数据(An opaque object representing a composited scene),Layer Tree再被送到GPU线程里(期间可能会经过多次硬件加速处理)供Skia引擎处理成GPU可使用的数据,这些数据最后经由OpenGL送给GPU进行渲染成帧,并最终由视频控制器交给显示器显示.
 
 #### 渲染流水线
 
@@ -71,9 +71,19 @@ Window类中提供了屏幕尺寸、事件回调、图形绘制接口以及其�
 - Layout(布局):确定各个Element的渲染对象 的尺寸和位置  RenderObject.performLayout()
 - Paint(绘制):把所有渲染对象绘制在不同的图层上  RenderObject.paint()
 
+当Flutter需要垂直同步信号驱动一个渲染流程的时候,会向Engine层发出信号请求调度一帧,Vsync到达Engine层后Dart运行时会调用Framework层的_beginFrame回调方法,此时Rendering Pipeline开始进行Animate阶段.
+
+Animate阶段完成以后Engine层会进行一系列微任务调用,然后再调用Framework层中的_drawFrame回调以完成Build、Layout、Paint的阶段.
+
+渲染流水线(Rendering Pipelline)完成后,Framework会调用render方法将产生的Layer Tree数据发送给Engine,由Engine再交给GPU进行渲染,最后由视频控制器发送给显示器显示.
+
+#### Flutter入口-runApp函数
+
+The widget is given constraints during layout that force it to fill the entire screen
 
 
-## Widget
+
+#### Widget
 
 - 基础widget定义在widgets.dart中,Meterial和Cupertino中都可以使用的
 
