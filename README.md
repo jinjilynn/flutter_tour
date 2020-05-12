@@ -14,6 +14,32 @@ Flutter采用自绘引擎方式进行UI渲染,也就是底层会调用OpenGL这�
 
 操作系统版本无关性就是各个操作系统的不同版本对UI的绘制几乎没有影响,因为Flutter的UI绘制并不是使用与操作系统版本具有强相关性的组件进行绘制的,也就不会有因为系统升级而导致的组件渲染差异所带来的各种奇奇怪怪的bug困扰.
 
+#### FLutter架构
+
+可以把整个Flutter架构分为两部分,上层的Framework和下层的Engine,如下图
+
+![frame_flutter](./images/frame_flutter.png)
+
+上层Framework是用Dart语言编写的UI框架,里面包含了元素、事件、动画、状态管理等部分;下层Engine是用C++实现的引擎,是连接上层Framework和底层操作系统的桥梁,主要包含Dart运行时、Skia渲染引擎和文字排版功能,也可以统一理解为Dart运行时和操作系统环境为其提供的接口.
+
+这种架构完全可以类比一下React架构,如下图
+
+![react](./images/react.png)
+
+React架构也可以分为两层,上层Framework和下层Engine
+
+上层Framework使用js编写的ui框架,里面也包含了元素、事件、动画、状态管理等部分;下层Engine也可以说是C++实现的,包含了js运行时和宿主环境为其提供的接口.
+
+在Dart中,有一个连接Flutter框架和C++引擎的关键类-Window类,window类在Dart中的官方解释是:The most basic interface to the host operating system's user interface.也就是宿主操作系统提供的最基本的接口.
+
+Window类中提供了屏幕尺寸、事件回调、图形绘制接口以及其他一些核心服务.这一点也和React框架十分相似.
+
+在js中的window对象,也是连接React框架和浏览器引擎的关键.React中的virtualDom最终都要经过window对象提供的接口(比如window.createElement、appendChild等)与浏览器进行通信并渲染在其中.
+
+在前端中,基于window对象和js语言,可以编写出React、Vue、Angular等不同的UI框架.
+
+同样的,基于Windows类和Dart语言,也可以编写出其他的UI框架来代替Flutter,只要你愿意.
+
 #### Flutter的渲染机制
 
 因为Flutter是自绘引擎,所以它的渲染机制是和底层的显像原理相关的
@@ -26,7 +52,7 @@ Flutter采用自绘引擎方式进行UI渲染,也就是底层会调用OpenGL这�
 
 所以Flutter渲染所关注的就是在下一次垂直信号到来之前(两次Vsync之间)尽可能快的计算出下一帧图像数据并交给GPU.
 
-也就是说Flutter的渲染动作是依靠垂直信号来驱动的(如下图)
+也就是说Flutter的渲染动作是依靠垂直信号(Vsync)来驱动的(如下图)
 
 ![vsync](./images/flutter_draw.png)
 
@@ -34,9 +60,17 @@ Flutter采用自绘引擎方式进行UI渲染,也就是底层会调用OpenGL这�
 
 #### 渲染流水线
 
-
+当GPU把垂直同步信号传递到UI线程里时(vsync是否要传入到UI线程里是Flutter调度的)会触发一个渲染流水线(Rendering Pipeline) 如下图
 
 ![render-pipeline](./images/render-pipeline.png)
+
+渲染流水线会按顺序进行一系列动作并最终产生一个Layer Tree:
+
+- Animate(动画):周期性的动作,animate会在每个Vsync信号到来后改变状态Widget State,State改变后会继续触发后面的重新渲染
+- Build(构建):重新构建需要被重新构建的widget
+- Layout(布局):确定各个Element的渲染对象 的尺寸和位置  RenderObject.performLayout()
+- Paint(绘制):把所有渲染对象绘制在不同的图层上  RenderObject.paint()
+
 
 
 ## Widget
