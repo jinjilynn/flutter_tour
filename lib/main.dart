@@ -8,7 +8,7 @@ import 'package:flutter_demo/clip.dart';
 // import 'package:flutter_demo/stack.dart';
 // import 'package:flutter_demo/column.dart';
 // import 'package:flutter_demo/flex.dart';
-// import 'package:flutter_demo/wrap.dart';
+import 'package:flutter_demo/wrap.dart';
 // import 'package:flutter_demo/row.dart';
 import 'package:flutter_demo/form.dart';
 // import 'package:flutter_demo/radiobutton.dart';
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home:
-          Scaffold(appBar: AppBar(title: Text('Learning')), body: FormDemo()),
+          Scaffold(appBar: AppBar(title: Text('Learning')), body: WrapDemo()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }
