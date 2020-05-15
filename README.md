@@ -187,7 +187,7 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
             window.onBeginFrame ??= _handleBeginFrame;
             window.onDrawFrame ??= _handleDrawFrame;
           }
-        ```
+          ```
 - PaintingBinding
   - Binding for the painting library
   - 绑定绘制库
@@ -198,6 +198,11 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
   - The glue between the render tree and the Flutter engine
   
   - 渲染树与Engine引擎的粘合,注册了一些平台指标、亮度等变化时的回调
+  
+  - renderView
+  
+    - RendererBinding中定义的属性
+    - render tree的根结点
   
   - pipelineOwner
     - RendererBinding里面定义的一个PipelineOwner类型的变量
@@ -275,7 +280,142 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
 - WidgetsBinding
   - The glue between the widgets layer and the Flutter engine
   - widget层与Engine引擎的粘合
+  - _buildOwner
+    - 在WidgetsBinding中主要做了一个_buildOwner的赋值并设置了一些系统回调
+    - 赋值类型为BuildOwner
+    - BuildOwner主要用于管理widget framework,跟踪哪些widgets需要更新,并标记elements是否为脏数据来决定elements是否需要更新
+    - BuildOwner是由操作系统来驱动的
 
+以上就是runApp中初始化的动作,初始化完成之后会调用scheduleAttachRootWidget挂载根节点
+```dart
+ @protected
+  void scheduleAttachRootWidget(Widget rootWidget) {
+    Timer.run(() {
+      attachRootWidget(rootWidget);
+    });
+  }
+```
+挂载根节点的操作是在一个异步队列Timer.run中调用attachRootWidget方法进行的
+```dart
+ void attachRootWidget(Widget rootWidget) {
+    _readyToProduceFrames = true;
+    _renderViewElement = RenderObjectToWidgetAdapter<RenderBox>(
+      container: renderView,
+      debugShortDescription: '[root]',
+      child: rootWidget,
+    ).attachToRenderTree(buildOwner, renderViewElement as RenderObjectToWidgetElement<RenderBox>);
+  }
+```
+在attachRootWidget中就是做了一个通过attachToRenderTree方法的返回值为\_renderViewElement变量赋值的操作_renderViewElement是一个Element类型,代表Element树的根结点.
+
+attatchToRenderTree方法是RenderObjectToWidgetAdapter这个widget适配器的一个方法,它起到一个桥梁作用,把RenderObject、Element还有Widget本身关联起来
+
+RenderObjectToWidgetAdapter的构造函数主要有两个参数
+
+- container
+  - 是在RendererBinding中初始化时赋过值的renderView变量
+- child
+  - runApp中传入的根widget
+
+```dart
+RenderObjectToWidgetElement<T> attachToRenderTree(BuildOwner owner, [ RenderObjectToWidgetElement<T> element ]) {
+    if (element == null) {
+      owner.lockState(() {
+        element = createElement();
+        assert(element != null);
+        element.assignOwner(owner);
+      });
+      owner.buildScope(element, () {
+        element.mount(null, null);
+      });
+      // This is most likely the first time the framework is ready to produce
+      // a frame. Ensure that we are asked for one.
+      SchedulerBinding.instance.ensureVisualUpdate();
+    } else {
+      element._newWidget = this;
+      element.markNeedsBuild();
+    }
+    return element;
+}
+```
+
+可以看到attatchToRenderTree主要就是返回了一个createElement方法创建的element
+
+```dart
+ @override
+  RenderObjectToWidgetElement<T> createElement() => RenderObjectToWidgetElement<T>(this);
+```
+
+方法中的RenderObjectToWidgetElement继承自RootRenderObjectElement,同时RootRenderObjectElement  >> RenderObjectElement >> Element
+
+RenderObjectToWidgetElement的构造函数传入了this这个widget适配器本身
+
+在RenderObjectElement中调用了RenderObjectToWidgetAdapter的createRenderObject方法对\_renderObject进行了赋值,赋的值就是传给RenderObjectToWidgetAdapter构造函数的container参数,也就是根render object
+
+in RenderObjectElement:
+```dart
+  @override
+  RenderObject get renderObject => _renderObject;
+  _renderObject = widget.createRenderObject(this);
+```
+in RenderObjectToWidgetAdapter:
+```dart
+@override
+  RenderObjectWithChildMixin<T> createRenderObject(BuildContext context) => container;
+```
+
+在Element类中,对\_widget变量进行了赋值,这个widget就是前面调用createElement时传入的this,也就是RenderObjectToWidgetAdapter本身
+```dart
+Element(Widget widget)
+    : assert(widget != null),
+      _widget = widget;
+
+```
+
+所以_renderViewElement是一个包含了widget和renderObject属性的Element变量.这样widget、element、renderObject就关联了起来.
+
+紧接着就是执行scheduleWarmUpFrame方法开始渲染流水线,在不等Vsync到来的情况下直接渲染出第一帧frame发送给engine.
+
+handleBeginFrame、handleDrawFrame这些任务队列就很熟悉了
+
+```dart
+  void scheduleWarmUpFrame() {
+    if (_warmUpFrame || schedulerPhase != SchedulerPhase.idle)
+      return;
+
+    _warmUpFrame = true;
+    Timeline.startSync('Warm-up frame');
+    final bool hadScheduledFrame = _hasScheduledFrame;
+    // We use timers here to ensure that microtasks flush in between.
+    Timer.run(() {
+      assert(_warmUpFrame);
+      handleBeginFrame(null);
+    });
+    Timer.run(() {
+      assert(_warmUpFrame);
+      handleDrawFrame();
+      // We call resetEpoch after this frame so that, in the hot reload case,
+      // the very next frame pretends to have occurred immediately after this
+      // warm-up frame. The warm-up frame's timestamp will typically be far in
+      // the past (the time of the last real frame), so if we didn't reset the
+      // epoch we would see a sudden jump from the old time in the warm-up frame
+      // to the new time in the "real" frame. The biggest problem with this is
+      // that implicit animations end up being triggered at the old time and
+      // then skipping every frame and finishing in the new time.
+      resetEpoch();
+      _warmUpFrame = false;
+      if (hadScheduledFrame)
+        scheduleFrame();
+    });
+
+    // Lock events so touch events etc don't insert themselves until the
+    // scheduled frame has finished.
+    lockEvents(() async {
+      await endOfFrame;
+      Timeline.finishSync();
+    });
+  }
+```
 
 #### Widget
 
