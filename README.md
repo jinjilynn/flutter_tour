@@ -64,7 +64,7 @@ Window类中提供了屏幕尺寸、事件回调、图形绘制接口以及其�
 
 ![render-pipeline](./images/render-pipeline.png)
 
-渲染流水线会按顺序进行一系列动作并最终产生一个Layer Tree:
+渲染流水线会按顺序进行一系列动作并最终产生一个场景Layer Tree:
 
 - Animate(动画):这里主要运行一些短暂的帧回调(transient frame callbacks)改变widget的state
 - Build(构建):根据state的变化重新构建需要被重新构建的widget
@@ -154,6 +154,9 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
 }
 ```
 
+如图:
+![internals_bindings](./images/internals_bindings.png)
+
 绑定的Mixin分别是
 
 - GestureBinding
@@ -234,7 +237,7 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
   
     - RendererBinding中的一个初始化操作
   
-    - 主要作用就是创建一个render tree的根结点,并把这个根结点挂在pipelineOwner的rootNode上
+    - 主要作用就是创建一个render tree的根结点,并把这个根结点挂在pipelineOwner的rootNode上,同时也对renderView变量赋值render tree的根结点
   
     - render tree的根结点是RenderView的实例,RenderView继承自RenderObject
   
@@ -313,7 +316,7 @@ attatchToRenderTree方法是RenderObjectToWidgetAdapter这个widget适配器的�
 RenderObjectToWidgetAdapter的构造函数主要有两个参数
 
 - container
-  - 是在RendererBinding中初始化时赋过值的renderView变量
+  - 是在RendererBinding中初始化时赋过值的renderView变量,也就是render tree的根节点
 - child
   - runApp中传入的根widget
 
