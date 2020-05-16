@@ -155,7 +155,7 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
 ```
 
 如图:
-![internals_bindings](./images/internals_bindings.png)
+![internals_bindings](./images/bindings.png)
 
 绑定的Mixin分别是
 
