@@ -331,6 +331,42 @@ ui.Window get window => ui.window;
 
   其中pipelineOwner.flushLayout()、pipelineOwner.flushCompositingBits()、pipelineOwner.flushPaint()这三个方法会循环遍历\_nodesNeedingLayout、\_nodesNeedingPaint、\_nodesNeedingCompositingBitsUpdate这三个list对元素进行操作(performLayout、PaintingContext.repaintCompositedChild、_updateCompositingBits方法).
 
+  ```dart
+    void flushLayout() {
+      ...
+      while (_nodesNeedingLayout.isNotEmpty) {
+        final List<RenderObject> dirtyNodes = _nodesNeedingLayout;
+        _nodesNeedingLayout = <RenderObject>[];
+        for (final RenderObject node in dirtyNodes..sort((RenderObject a, RenderObject b) => a.depth - b.depth)) {
+          if (node._needsLayout && node.owner == this)
+            node._layoutWithoutResize();
+        }
+      }
+    }
+
+    void flushCompositingBits() {
+      ...
+      for (final RenderObject node in _nodesNeedingCompositingBitsUpdate) {
+        if (node._needsCompositingBitsUpdate && node.owner == this)
+          node._updateCompositingBits();
+      }
+    }
+    void flushPaint() {
+      final List<RenderObject> dirtyNodes = _nodesNeedingPaint;
+      _nodesNeedingPaint = <RenderObject>[];
+      // Sort the dirty nodes in reverse order (deepest first).
+      for (final RenderObject node in dirtyNodes..sort((RenderObject a, RenderObject b) => b.depth - a.depth)) {
+        if (node._needsPaint && node.owner == this) {
+          if (node._layer.attached) {
+            PaintingContext.repaintCompositedChild(node);
+          } else {
+            node._skippedPaintingOnLayer();
+          }
+        }
+      }
+  }
+  ```
+
 - WidgetsBinding
 
   ​	to be continued...
