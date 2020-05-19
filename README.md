@@ -1,100 +1,113 @@
 # Flutter
 
-#### 关于Flutter
+### 关于Flutter
 
 Flutter是一个由谷歌开发的开源UI框架，用于为Android、iOS、 Windows、Mac、Linux、Fuchsia开发应用.
 
 ![fsen](./images/fsen.png)
 
-Flutter采用自绘引擎方式进行UI渲染,也就是底层会调用OpenGL这种跨平台的绘制引擎直接为GPU提供绘制数据,所以其性能会大于等于原生组件的性能.
+Flutter采用自绘引擎的方式进行UI渲染,也就是底层会调用OpenGL这种跨平台的绘制引擎直接为GPU提供绘制数据,所以其性能会大于等于原生组件的性能.
 
-自绘引擎的方式会带来两个好处:一个是平台无关性;一个是操作系统版本的无关性.
+采用自绘引擎的方式会带来两个好处:一个是平台无关性;一个是操作系统版本的无关性.
 
-平台无关性是说在Android、ios、Windows、Mac、Linux、Fushia等操作系统中UI会有良好的一致性体验.这个很好理解,因为各个平台的OpenGL引擎的表现是一致的.
+平台无关性是说在Android、ios、Windows、Mac、Linux、Fushia等操作系统中UI会有良好的一致性体验.这个很好理解,因为各个平台的显示原理与OpenGL引擎的表现是一致的.
 
-操作系统版本无关性就是各个操作系统的不同版本对UI的绘制几乎没有影响,因为Flutter的UI绘制并不是使用与操作系统版本具有强相关性的组件进行绘制的,也就不会有因为系统升级而导致的组件渲染差异所带来的各种奇奇怪怪的bug困扰.
+操作系统版本无关性就是说操作系统的不同版本对UI的绘制几乎没有影响,因为Flutter的UI绘制并不是使用与操作系统版本具有强相关的组件进行绘制的,也就不会有因为操作系统升级而导致的组件渲染差异所带来的一些奇奇怪怪的bug困扰.
 
-#### Flutter架构
+### Flutter架构
 
-可以把整个Flutter架构分为两部分,上层的Framework和下层的Engine,如下图
+可以把整个Flutter架构分为上下两部分,上层为Framework,下层为Engine.	如下图:
 
 ![frame_flutter](./images/frame_flutter.png)
 
-上层Framework是用Dart语言编写的UI框架,里面包含了元素、事件、动画、状态管理等部分;下层Engine是用C++实现的引擎,是连接上层Framework和底层操作系统的桥梁,主要包含Dart运行时、Skia渲染引擎和文字排版功能,也可以统一理解为Dart运行时和操作系统环境为其提供的接口.
+上层Framework是由Dart语言和用Dart编写的Flutter框架组成;下层Engine是用C++实现的引擎,是连接上层Framework和底层操作系统的桥梁,主要包含Dart运行时和操作系统环境为运行时提供的接口(Skia渲染引擎和文字排版引擎).
+
+在Flutter架构中,有一个在Framework和Engine引擎之间起到连接作用的关键类:即Window类.
+
+Window类是定义在Dart:ui中的,其官方解释是:The most basic interface to the host operating system's user interface.也就是宿主操作系统提供的最基本的接口.
+
+Window类提供了屏幕尺寸、事件回调、图形绘制接口以及其他一些核心服务.
 
 这种架构完全可以类比一下React架构,如下图
 
 ![react](./images/react.png)
 
-React架构也可以分为两层,上层Framework和下层Engine
+React架构也可以分为上下两部分,上层为Framework,下层为Engine.
 
-上层Framework使用js编写的ui框架,里面也包含了元素、事件、动画、状态管理等部分;下层Engine也可以说是C++实现的,包含了js运行时和宿主环境为其提供的接口.
+上层Framework是由Javascript语言和用Javascript编写的React框架组成;下层Engine是用C++实现的引擎,也是连接上层Framework和底层操作系统的桥梁,主要包含JS运行时和操作系统为运行时提供的接口(也就是宿主环境,比如浏览器,浏览器里封装了对操作系统Network、GPU等的调用).
 
-在Dart中,有一个在Flutter框架和C++引擎之间起到粘合剂作用的关键类(Window类),window类是定义在Dart中的,其官方解释是:The most basic interface to the host operating system's user interface.也就是宿主操作系统提供的最基本的接口.
+在React架构中,也有一个在Framework和Engine引擎之间起到连接作用的关键对象:window对象.
 
-Window类中提供了屏幕尺寸、事件回调、图形绘制接口以及其他一些核心服务.这一点也和React框架十分相似.
+window对象是宿主环境为javascript语言提供的,其官方解释是:The window object is supported by all browsers. It represents the browser's window.All global JavaScript objects, functions, and variables automatically become members of the window object. Global variables are properties of the window object.Global functions are methods of the window object.Even the document object (of the HTML DOM) is a property of the window object.也就是宿主浏览器提供的功能接口.
 
-在javascript语言中的window对象,也是连接React框架和浏览器引擎的关键.React中的virtualDom最终都要经过window对象提供的接口(比如window.createElement、appendChild等)与浏览器进行通信并渲染在其中.
+window对象提供了窗口尺寸、事件注册、网络请求等一些服务.
 
-在浏览器中,window对象就是javascript提供的和浏览器的接口,基于window对象,可以编写出React、Vue、Angular等不同的UI框架.
+在浏览器中,基于window对象,可以用javascript编写出React、Vue、Angular等不同的UI框架.
 
-在移动端中,Window类就是Dart提供的和操作系统的接口,基于Windows类,也可以编写出其他的UI框架来代替Flutter,只要你愿意.
+同样的,在移动端中,基于Windows类,也可以用Dart编写出其他的UI框架来代替Flutter,只要你愿意.
 
-#### Flutter的渲染机制
+### Flutter的渲染机制
 
-因为Flutter是自绘引擎,所以它的渲染机制是和底层的显像原理相关的
+因为Flutter采用的自绘引擎,所以它的渲染机制是和底层的显像原理相关的
 
 ![visual](./images/visual.png)
 
 在计算机系统中,显示器显示的图像帧来自于GPU缓存,GPU缓存中的图像帧是GPU计算的结果,GPU计算需要的数据是CPU通过总线传递过来的.
 
-显示器每显示完一帧图像就会发送一个垂直信号(Vsync)给视频控制器,视频控制器就会从GPU缓存中读取下一帧图像并传递给显示器显示,如果一个显示器是60hz的刷新频率,也就是说这个显示器每秒会发送60次这样的垂直信号(Vsync).
+显示器每显示完一帧图像就会发送一个垂直信号(Vsync)给视频控制器,视频控制器就会从GPU缓存中读取下一帧图像并传递给显示器显示,如果一个显示器是60Hz的刷新频率,也就是说这个显示器每秒会发送60次这样的垂直信号(Vsync).同样,如果GPU在一秒内可以吐出90帧的图像,那么显示输出就是90fps.
 
-所以Flutter渲染所关注的就是在下一次垂直信号到来之前(两次Vsync之间)尽可能快的计算出下一帧图像数据并交给GPU.
+而Flutter渲染所关注的就是在下一次垂直信号到来之前(两次Vsync之间)尽可能快的计算出下一帧图像数据并交给GPU.
 
-也就是说Flutter的渲染动作是依靠垂直信号(Vsync)来驱动的(如下图)
+##### 换句话说,Flutter的渲染动作完全是依靠垂直信号(Vsync)来驱动的(除了第一次),记住这一点很重要,因为不论是通过setState更新UI还是UI动画的渲染,都是依靠不断请求Vsync来驱动进行的.
 
 ![vsync](./images/flutter_draw.png)
 
-显示器发送的垂直同步信号(Vsync)被GPU传递到UI线程里,UI线程里的Dart运行时接受到Vsync后会进行一个被称为渲染流水线的处理过程来生成一种叫场景(Layer Tree)的图像数据(An opaque object representing a composited scene),场景再被送到GPU线程里(期间可能会经过多次硬件加速处理)供Skia引擎处理成GPU可使用的数据,这些数据最后经由OpenGL送给GPU进行渲染成帧,并最终由视频控制器交给显示器显示.
+如上图,Flutter请求来的垂直同步信号(Vsync)被GPU传递到UI线程里,UI线程里的Dart运行时接受到Vsync后会进行一个被称为渲染流水线(Rendering Pipeline)的处理过程来生成一种叫场景的图像数据(An opaque object representing a composited scene),场景再被送到GPU线程里(期间可能会多次经过硬件加速处理的过程)供Skia引擎处理成GPU可使用的数据,这些数据最后经由OpenGL送给GPU进行渲染成帧,并最终由视频控制器交给显示器显示.
 
-#### 渲染流水线
+### 渲染流水线
 
-当GPU把垂直同步信号传递到UI线程里时(vsync是否要传入到UI线程里是Flutter调度的)会触发一个渲染流水线(Rendering Pipeline) 如下图
+当把请求过来的Vsync传递到UI线程里时会触发一个渲染流水线(Rendering Pipeline) 如下图
 
-![render-pipeline](./images/render-pipeline.png)
+![render-pipeline](./images/rendering-pipeline.png)
 
-渲染流水线会按顺序进行一系列动作并最终产生一个场景Layer Tree:
+渲染流水线会按顺序进行一系列阶段并最终产生一个Scene并发送给GPU:
 
-- Animate(动画):这里主要运行一些短暂的帧回调(transient frame callbacks)改变widget的state
-- Build(构建):根据state的变化重新构建需要被重新构建的widget
-- Layout(布局):更新 render object的尺寸和位置
-- Paint(绘制):对render object进行图层合成与绘制
-- render(输出): 最后调用window.render方法输出Layer Tree场景
+- Animate(动画阶段):这个阶段要运行一些和动画相关的瞬时回调(transient frame callbacks),因为这里要和普通的重绘区别对待,动画里会涉及是否要再发起新的一帧以及何时发起的计算,这也是第一步需要确定的.
+- Microtasks(微任务阶段):动画阶段会产生一些微任务,这个阶段执行那些微任务.
+- Layout(布局阶段):这个阶段会重新计算所有被标记为dirty的RenderObject的尺寸和大小.
+- CompositingBits(合成标记阶段):对RenderObject进行标记,是否需要在下次的渲染流水线中重绘
+- Paint(绘制阶段):使用PaintingContext对所有脏RendeObject进行重新绘制,这个阶段会产生Layer Tree
+- Compositing(合成阶段):这个阶段会把Layer Tree转换成场景并发送到GPU
+- Semantics(语义阶段):更新发送语义
+- Finalization(完结阶段):主要进行一些收尾工作,比如卸载所有不处于active状态的element
 
-当Flutter需要垂直同步信号驱动一个渲染流程的时候,会向Engine层发出信号请求调度一帧,Vsync到达Engine层后Dart运行时会调用Framework层的_handleBeginFrame回调方法,此时Rendering Pipeline开始进行Animate阶段.
+当Flutter需要更新UI的时候,会请求一次Vsync信号来触发一次重新渲染.
 
-在Animate阶段一些微任务(microtasks)会被安排进事件队列里优先执行,这些微任务主要就是更改widger state 并完车widget的rebuild
+Vsync信号到达engine层时,engine会调用 window.onBeginFrame回调,此时Rendering Pipeline开始进行Animate和Microtasks阶段.
 
-microtasks完成以后会再调Framework层中的_handleDrawFrame回调以完成Layout、Paint的阶段.
-
-渲染流水线(Rendering Pipeline)完成后,Framework会调用render方法将产生的场景(Layer Tree)数据发送给Engine,由Engine再交给GPU进行渲染,最后由视频控制器发送给显示器显示.
+在Animate和Microtasks阶段完成后,engine会接着调用window.onDrawFrame回调,该回调会进行Rendering Pipeline剩下的阶段.
 
 ![pipeline](./images/pipeline.png)
 
-#### Flutter入口-runApp函数
+以上就是一个完整的渲染流水线,由此可见Rendering Pipeline的8个阶段是在onBeginFrame和onDrawFrame这两个回调中触发的.
+
+再次强调Flutter的渲染动作完全是依靠垂直信号(Vsync)来驱动的,不论是通过setState更新UI还是UI动画的渲染,都是依靠不断请求Vsync来驱动进行的.但除了第一次,即入口函数里的runApp,因为第一次渲染不会请求Vsync而是直接进入流水线渲染.
+
+下面通过runApp入口函数来具体看一下渲染流水线的各个阶段.
+
+### Flutter入口-runApp函数
 
 runApp函数的官方解释是Inflate the given widget and attach it to the screen.The widget is given constraints during layout that force it to fill the entire screen.
 
 也就是说调用runApp的结果就是展开一个widget并挂载到屏幕上,并且会给这个被挂载的widget一个铺满整个屏幕的约束.
 
-runApp函数在程序中可以被调用多次.
+runApp函数在程序中可以被调用多次.当再次被调用时,原来挂载到屏幕上的根widget会被卸载掉,并替换上新传入的根widget,这两个widget之间仍然会进行diff算法比较只进行边际增量的更新.
 
-当再次被调用时,原来挂载到屏幕上的根widget会被卸载掉,并替换上新传入的根widget,这两个widget之间仍然会进行diff算法比较只进行边际增量的更新.
+这是Flutter规定的内置入口,除非自己实现一个Xlutter框架可以不走这个入口.
 
-但以上只是runApp运行的结果,并没有体现出Rendering Pipeline来,所以需要查看runApp具体做了哪些事情.
+但以上只是runApp运行的结果,并没有体现出渲染流水线的具体过程来
 
-点开runApp函数
+所以需要点开runApp源码查看具体做了哪些事情
 
 
 ```dart
@@ -105,25 +118,16 @@ void runApp(Widget app) {
 }
 ```
 
-再点开WidgetsFlutterBinding类
+runApp方法里很简洁,总结起来一共做了三件事情:
+
+- 初始化了WidgetsFlutterBinding类的实例
+- 调用了实例的scheduleAttachRootWidget方法
+- 调用了实例的scheduleWarmUpFrame方法
+
+接着再查看WidgetsFlutterBinding类的初始化过程
 
 ```dart
-/// A concrete binding for applications based on the Widgets framework.
-///
-/// This is the glue that binds the framework to the Flutter engine.
 class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBinding, SchedulerBinding, PaintingBinding, SemanticsBinding, RendererBinding, WidgetsBinding {
-
-  /// Returns an instance of the [WidgetsBinding], creating and
-  /// initializing it if necessary. If one is created, it will be a
-  /// [WidgetsFlutterBinding]. If one was previously initialized, then
-  /// it will at least implement [WidgetsBinding].
-  ///
-  /// You only need to call this method if you need the binding to be
-  /// initialized before calling [runApp].
-  ///
-  /// In the `flutter_test` framework, [testWidgets] initializes the
-  /// binding instance to a [TestWidgetsFlutterBinding], not a
-  /// [WidgetsFlutterBinding].
   static WidgetsBinding ensureInitialized() {
     if (WidgetsBinding.instance == null)
       WidgetsFlutterBinding();
@@ -132,154 +136,205 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBin
 }
 ```
 
-可以看到在runApp里就是实现了WidgetsFlutterBinding类的单例,并调用单例的scheduleAttachRootWidget方法挂载widget.
+发现ensureInitialized并不是一个命名构造函数,而是一个静态方法,这个静态方法实现了WidgetsFlutterBinding的单例模式.
 
-官方对WidgetsFlutterBinding的解释是A concrete binding for applications based on the Widgets framework.
- This is the glue that binds the framework to the Flutter engine.就是说,WidgetsFlutterBinding这个类对应用程序做了一些具体绑定的初始化工作,绑定的作用就是使上层的Framework和下层的Engine粘合起来.
+在静态方法ensureInitialized内部调用了WidgetsFlutterBinding的默认构造函数,并返回WidgetsFlutterBinding实例.
 
-前面提到过Framework和Engine之间的粘合剂就是Window类,Window类是Flutter框架和底层操作系统之间的接口.所以WidgetsFlutterBinding所做的绑定初始化工作就是把Window类的一些功能在Flutter中进行一些封装,并绑定到Window上.
+这里有很多值得研究的地方,当调用WidgetsFlutterBinding()的时候,其实是进行了很多的绑定动作的.
 
-在WidgetsFlutterBinding类的父类BindingBase中有一个window getter
+首先观察到WidgetsFlutterBinding继承了BindingBase类,并且mixin了7种binding.BindingBase类的默认构造函数会调用initInstances方法,而这7种binding也都重写了initInstances方法,也就是说在调用WidgetsFlutterBinding()构造函数初始化的时候,这7个binding所重写的initInstances也都会执行并且只一遍来执行相应的初始化绑定操作.
 
+其次还要注意到这7种mixin混入的顺序,先混入的binging要比后混入的binding更基础,因为后混入的binding会使用或重写先混入的binding中的方法,由此可以看出widgetsBinding是更higher-level的库,所以说WidgetsFlutterBinding的注释中会有这么一句话
+
+![WidgetFlutterBinding](./images/WidgetFlutterBinding.png)
+
+即应用程序基于Widgets framework的具体绑定.也可以大体可以猜到这个类为什么叫WidgetsFlutterBinding而不叫RenderingFlutterBinding或其他的名字,因为WidgetsBinding之前的初始化都是直接和渲染层(render layer)打交道的,在渲染层之上你也可以实现其他的更高级的库,比如叫个Xidgets、Yidgets啥的.事实上Flutter也确实提供了只到RendererBinding绑定的类以供使用.
 ```dart
- /// The window to which this binding is bound.
-  ui.Window get window => ui.window;
+class RenderingFlutterBinding extends BindingBase with GestureBinding, ServicesBinding, SchedulerBinding, SemanticsBinding, PaintingBinding, RendererBinding {
+  RenderingFlutterBinding({ RenderBox root }) {
+    assert(renderView != null);
+    renderView.child = root;
+  }
+}
 ```
+#### About Binding Mixins
 
-这个window getter引用的就是Window类实例,而后混入各种的Mixin就是对Window中提供功能的一些封装并在初始化的时候绑定在Window上.
+通过这7种mixin的名字也可以知道它们的主要作用就是在初始化的过程中进行一些绑定操作,这些绑定主要就是通过绑定window实例上的某些回调来和Engin层进行通信,前面讲过window是Framework层和Engine层的粘合剂.
+
+要绑定window上的回调就要先引用这个window对象,所以在BindingBase中可以看到以下这段代码
 
 ```dart
-mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureBinding, RendererBinding, SemanticsBinding {
-  ...
+import 'dart:ui' as ui show saveCompilationTrace, Window, window;
+...
+abstract class BindingBase {
+...
+ui.Window get window => ui.window;
+...
 }
 ```
 
-如图:
-![internals_bindings](./images/bindings.png)
+这段代码在BindingBase中设置了一个window getter,引用了dart:ui中的window实例,这个window getter可以在所有的binding中被使用.
 
-绑定的Mixin分别是
+接下来
 
 - GestureBinding
-  -  A binding for the gesture subsystem
-  -  手势子系统的绑定
+
+  这个binding看名字就可以知道,主要就是进行一些手势相关的绑定.绑定了window对象上的 onPointerDataPacket 回调
+  ```dart
+    window.onPointerDataPacket = _handlePointerDataPacket;
+  ```
+  
 - ServicesBinding
-  - Listens for platform messages
-  - 平台消息的监听
+
+  这个binding主要是对平台消息进行监听并对消息进行转发
+  ```dart
+     window.onPlatformMessage = defaultBinaryMessenger.handlePlatformMessage;
+  ```
+  
 - SchedulerBinding
-  - Scheduler for running _Transient callbacks_、_Persistent callbacks_、_Post-frame callbacks_
-  - 就是对一次帧(frame)请求及以后回调队列的管理
-  - 这里面定义了一个帧(请求)的方法
-    - ```dart
-        /// If necessary, schedules a new frame by calling
-        void scheduleFrame() {
-          if (_hasScheduledFrame || !framesEnabled)
-            return;
-          assert(() {
-            if (debugPrintScheduleFrameStacks)
-              debugPrintStack(label: 'scheduleFrame() called. Current phase is $schedulerPhase.');
-            return true;
-          }());
-          ensureFrameCallbacksRegistered();
-          window.scheduleFrame();
-          _hasScheduledFrame = true;
-        }
-      ```
-    - 其中的ensureFrameCallbacksRegistered方法确保了window对象上onBeginFrame和onDrawFrame绑定了_handleBeginFrame、handleDrawFrame回调方法
-      -  ```dart
-          void ensureFrameCallbacksRegistered() {
-            window.onBeginFrame ??= _handleBeginFrame;
-            window.onDrawFrame ??= _handleDrawFrame;
-          }
-          ```
+
+  这个binding很重要,渲染流水线中的window.onBeginFrame回调和window.onDrawFrame回调,还有发起一帧的请求都是在这里注册的
+  ```dart
+  //注册onBeginFrame和onDrawFrame回调
+    @protected
+    void ensureFrameCallbacksRegistered() {
+      window.onBeginFrame ??= _handleBeginFrame;
+      window.onDrawFrame ??= _handleDrawFrame;
+    }
+  ```
+  ```dart
+  //请求一帧
+    void scheduleFrame() {
+      if (_hasScheduledFrame || !framesEnabled)
+        return;
+      ensureFrameCallbacksRegistered();
+      window.scheduleFrame();
+      _hasScheduledFrame = true;
+    }
+  ```
+
+  同时它还为渲染流水线提供流程管理的功能,为了协调“发起一帧”这个动作与Rendering Pipeline中8个阶段的执行顺序(因为一次Rendering Pipeline可能没有执行完,app就又发起了一次帧请求),SchedulerBinding内部定义了5种不同的Schedule状态
+
+  - idle
+    - 空闲状态
+  - transientCallbacks
+    - 瞬时回调被执行状态,执行Animate阶段的函数都被注册进transientCallbacks里面
+  - midFrameMicrotasks
+    - 瞬时回调返回的微任务被执行状态
+  - persistentCallbacks
+    - 持久回调被执行状态.执行Layout、Compositing bits、Paint、Compositing、Semantics、Finalization这些阶段的函数都被注册进了persistentCallbacks里面
+  - postFrameCallbacks
+    - 收尾回调被执行,这里的函数主要进行一些clean动作并为下一次帧请求做好准备
+  
+  当onBeginFrame的回调被调用后渲染流水线进入的Animate阶段和Microtasks阶段对应的就是transientCallbacks状态和midFrameMicrotasks状态,而persistentCallbacks状态对应的就是onDrawFrame的回调被调用后渲染流水线进入的剩下6个阶段.
+  
+  在ensureVisualUpdate函数(这个函数是在UI需要重绘时触发的)中可以看出只有当Schedule阶段处于idle和postFrameCallbacks状态(也就是)时才会发起新的一帧请求
+  ```dart
+  void ensureVisualUpdate() {
+    switch (schedulerPhase) {
+      case SchedulerPhase.idle:
+      case SchedulerPhase.postFrameCallbacks:
+        scheduleFrame();
+        return;
+      case SchedulerPhase.transientCallbacks:
+      case SchedulerPhase.midFrameMicrotasks:
+      case SchedulerPhase.persistentCallbacks:
+      return;
+    }
+  }
+  ```
+  
+  
+  
 - PaintingBinding
-  - Binding for the painting library
-  - 绑定绘制库
+
+  绑定绘制库,做一些和图片缓存相关的工作
+
 - SemanticsBinding
-  - The glue between the semantics layer and the Flutter engine
-  - 语义层和Engine引擎的粘合,涉及平台辅助功能更改时的调用
+
+  语义层的绑定,平台可能启动的其他辅助功能
+
+  ```dart
+  _accessibilityFeatures = window.accessibilityFeatures;
+  ```
+
 - RendererBinding
-  - The glue between the render tree and the Flutter engine
-  
-  - 渲染树与Engine引擎的粘合,注册了一些平台指标、亮度等变化时的回调
-  
-  - renderView
-  
-    - RendererBinding中定义的属性
-    - render tree的根结点
-  
-  - pipelineOwner
-    - RendererBinding里面定义的一个PipelineOwner类型的变量
-      - ```dart
-          PipelineOwner get pipelineOwner => _pipelineOwner;
-          PipelineOwner _pipelineOwner;
-        ```
-      
-    - 该变量持有render tree的根结点,用于管理并驱动rendering pipeline,并保存相关state
-    
-    - 主要方法
-    
-      - flushLayout
-        - 更新所有脏render object的布局信息
-        - 间接调用renderObject的performLayout方法
-      - flushCompositingBits
-        - 检查是否需要合成图层,是则对render object进行图层合成
-        - 间接调用renderObject的_updateCompositingBits方法来更新RenderObject.needsCompositing属性值,为true需要重绘
-      - flushPaint
-        - 检查是否需要重新绘制,需要则对render object进行绘制
-        - 间接调用renderObject的paint方法
-    
-    - 重要属性
-    
-      - rootNode
-        - render tree的根结点
-    
-  - initRenderView
-  
-    - RendererBinding中的一个初始化操作
-  
-    - 主要作用就是创建一个render tree的根结点,并把这个根结点挂在pipelineOwner的rootNode上,同时也对renderView变量赋值render tree的根结点
-  
-    - render tree的根结点是RenderView的实例,RenderView继承自RenderObject
-  
-      - RenderView
-  
-        - 主要参数
-  
-          - configuration
-            - 主要是一些手机屏幕的相关信息
-          - window
-            - Window类的实例
-            - 在渲染流水线的最后一步使用,用于输出场景_window.render(scene)
-    
-  - addPersistentFrameCallback
-  
-    - RendererBinding中的一个初始化操作
-    - 用于在persistent回调列表_persistentCallbacks中添加回调,这些回调会在Window.onDrawFrame回调中触发
-      - 添加的回调是_handlePersistentFrameCallback
-        - ```dart
-             void _handlePersistentFrameCallback(Duration timeStamp) {
-                drawFrame();
-                _mouseTracker.schedulePostFrameCheck();
-             }
-          ```
-          
-        - drawFrame
-          - ```dart
-                @protected
-                void drawFrame() {
-                  assert(renderView != null);
-                  pipelineOwner.flushLayout();
-                  pipelineOwner.flushCompositingBits();
-                  pipelineOwner.flushPaint();
-                  if (sendFramesToEngine) {
-                    renderView.compositeFrame(); // this sends the bits to the GPU
-                    pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
-                    _firstFrameSent = true;
-                  }
-              }
-            ```
-          - 这个drawFrame调用了pipelineOwner的flushLayout、flushCompositingBits、flushPaint方法完成了layout和paint操作,然后再嗲用renderView的compositeFrame方法向engine(引擎)输出(render)场景(render tree)
-  
+
+  这个binding也相当重要,主要做了一些和渲染有关的事情.
+
+  在Flutter应用中凡是屏幕中能看到视觉渲染效果都是用render tree渲染出来的, render tree会被加工成layer tree,而layer tree又会被转化成一个scene输送给GPU.
+
+  render tree是由多个render object组成的一棵树结构,而正是在这个binding里create了这棵树的根节点renderView.
+
+  这个根节点renderView里面有个叫compositeFrame的方法,这个方法就是在渲染流水线的Compositing阶段把layer tree转化成scene并输送给GPU的方法.
+
+  其中的buildScene和render分别对应了转化和输送阶段.
+
+  ```dart
+  void compositeFrame() {
+    Timeline.startSync('Compositing', arguments: timelineWhitelistArguments);
+    try {
+      final ui.SceneBuilder builder = ui.SceneBuilder();
+      final ui.Scene scene = layer.buildScene(builder);
+      if (automaticSystemUiAdjustment)
+        _updateSystemChrome();
+      _window.render(scene);
+      scene.dispose();
+    } finally {
+      Timeline.finishSync();
+    }
+  }
+  ```
+
+  这个binding还初始化了一个PipelineOwner实例来管理render tree上的所有节点.
+
+  这个PipelineOwner实例只会被初始化一次,并会被所有render object所共同持有,每个render object都会有一个owner字段引用该实例.
+
+  PipelineOwner主要维护了两个list
+
+  - _nodesNeedingLayout
+    - 需要重新layout的脏render object
+  - _nodesNeedingPaint
+    - 需要重新paint的脏render object
+  - _nodesNeedingCompositingBitsUpdate
+    - 被标记的render object以供判断
+
+  当脏render objects需要重新layout或paint的时候,会调用PipelineOwner实例的onNeedVisualUpdate回调,这个回调会间接触发ensureVisualUpdate方法来请求一帧并触发一次rendering pipeline.
+
+  而一次rendering pipeline周期中onDrawFrame回调所调用的persistentCallbacks也是在这个binding里注册的
+  ```dart
+  //注册persistentCallbacks
+  addPersistentFrameCallback(_handlePersistentFrameCallback);
+  ...
+  ...
+  ...
+  //定义的persistentCallbacks回调
+  void _handlePersistentFrameCallback(Duration timeStamp) {
+    drawFrame();
+    _mouseTracker.schedulePostFrameCheck();
+  }
+  @protected
+  void drawFrame() {
+    assert(renderView != null);
+    pipelineOwner.flushLayout();
+    pipelineOwner.flushCompositingBits();
+    pipelineOwner.flushPaint();
+    if (sendFramesToEngine) {
+      renderView.compositeFrame(); // this sends the bits to the GPU
+      pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
+      _firstFrameSent = true;
+    }
+  }
+  ```
+
+  这里面的pipelineOwner.flushLayout()、pipelineOwner.flushCompositingBits()、pipelineOwner.flushPaint()、renderView.compositeFrame()、pipelineOwner.flushSemantics()分别对应了render pipeline中的Layout、CompositingBits、Paint、Compositing、Semantics阶段
+
+  其中pipelineOwner.flushLayout()、pipelineOwner.flushCompositingBits()、pipelineOwner.flushPaint()这三个方法会循环遍历\_nodesNeedingLayout、\_nodesNeedingPaint、\_nodesNeedingCompositingBitsUpdate这三个list对元素进行操作(performLayout、PaintingContext.repaintCompositedChild、_updateCompositingBits方法).
+
+- WidgetsBinding
+
+  ​	to be continued...
+
 - WidgetsBinding
   - The glue between the widgets layer and the Flutter engine
   - widget层与Engine引擎的粘合
@@ -288,6 +343,7 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
     - 赋值类型为BuildOwner
     - BuildOwner主要用于管理widget framework,跟踪哪些widgets需要更新,并标记elements是否为脏数据来决定elements是否需要更新
     - BuildOwner是由操作系统来驱动的
+    - 一个Element树只能有一个BuildOwner,也可以多建几个BuildOwner来管理离屏Element树
 
 以上就是runApp中初始化的动作,初始化完成之后会调用scheduleAttachRootWidget挂载根节点
 ```dart
@@ -420,7 +476,7 @@ handleBeginFrame、handleDrawFrame这些任务队列就很熟悉了
   }
 ```
 
-#### Widget
+### Widget
 
 - 基础widget定义在widgets.dart中,Meterial和Cupertino中都可以使用的
 
