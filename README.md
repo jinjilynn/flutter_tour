@@ -290,7 +290,7 @@ ui.Window get window => ui.window;
 
   这个PipelineOwner实例只会被初始化一次,并会被所有render object所共同持有,每个render object都会有一个owner字段引用该实例.
 
-  PipelineOwner主要维护了两个list
+  PipelineOwner主要维护了三个list
 
   - _nodesNeedingLayout
     - 需要重新layout的脏render object
@@ -343,7 +343,7 @@ ui.Window get window => ui.window;
         }
       }
     }
-
+  
     void flushCompositingBits() {
       ...
       for (final RenderObject node in _nodesNeedingCompositingBitsUpdate) {
@@ -366,6 +366,13 @@ ui.Window get window => ui.window;
       }
   }
   ```
+  到这里Flutter的渲染流水线需要的绑定和回调已经都注册完成,一个完整的流水线可以运行起来了.
+
+  ![pipe](./images/pipe.png)
+
+  可以发现Rendering Pipeline就是对Render Tree进行加工操作并最终返回一个Scene的过程,完全看不到Widget和Element的影子,这也再次印证了RenderFlutterBinding是直接和渲染层打交道的,可以在这之上编写一个更higher-level的库来实现一个UI框架.
+
+  如果说Flutter是一个响应式的UI框架,Render Tree代表UI,那么Widget和Element就代表了响应式,就好比React中VirtualDOM和Dom之间的关系
 
 - WidgetsBinding
 
