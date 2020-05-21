@@ -244,8 +244,6 @@ ui.Window get window => ui.window;
   }
   ```
   
-  
-  
 - PaintingBinding
 
   绑定绘制库,做一些和图片缓存相关的工作
@@ -372,55 +370,112 @@ ui.Window get window => ui.window;
 
   可以发现Rendering Pipeline就是对Render Tree进行加工操作并最终返回一个Scene的过程,完全看不到Widget和Element的影子,这也再次印证了RenderFlutterBinding是直接和渲染层打交道的,可以在这之上编写一个更higher-level的库来实现一个UI框架.
 
-  如果说Flutter是一个响应式的UI框架,Render Tree代表UI,那么Widget和Element就代表了响应式,就好比React中VirtualDOM和Dom之间的关系
+  如果说Flutter是一个响应式的UI框架,Render Tree代表UI,那么Widget和Element就代表了响应式,就好比React中VirtualDOM和Dom之间的关系.
 
 - WidgetsBinding
 
-  ​	to be continued...
+  这层的binding相比前面的binding是在更高一层上做了初始化操作,前面的binding主要涉及render layer,而这层binding主要涉及widgets layer.也可以这么说,这层binding做了对render tree的代理(即widget)所封装的响应式逻辑的初始化.
 
-- WidgetsBinding
-  - The glue between the widgets layer and the Flutter engine
-  - widget层与Engine引擎的粘合
-  - _buildOwner
-    - 在WidgetsBinding中主要做了一个_buildOwner的赋值并设置了一些系统回调
-    - 赋值类型为BuildOwner
-    - BuildOwner主要用于管理widget framework,跟踪哪些widgets需要更新,并标记elements是否为脏数据来决定elements是否需要更新
-    - BuildOwner是由操作系统来驱动的
-    - 一个Element树只能有一个BuildOwner,也可以多建几个BuildOwner来管理离屏Element树
+  WidgetsBinding在初始化的时候基本上就做了两件事情:
 
-以上就是runApp中初始化的动作,初始化完成之后会调用scheduleAttachRootWidget挂载根节点
+  - 实例化了一个所有Element都持有并共享的BuildOwner,每个Element实例都通过owner字段引用该实例.这点和PipelineOwner差不多.一棵Element树只能有一个BuildOwner,但也可以多建几个BuildOwner来管理离屏的Element树
+    -  ```dart
+        _buildOwner = BuildOwner();
+       ```
+    
+  - 绑定了window上的两个回调
+    - ```dart
+        window.onLocaleChanged = handleLocaleChanged;
+        window.onAccessibilityFeaturesChanged = handleAccessibilityFeaturesChanged;
+      ```
+  
+   BuildOwner主要作用就是跟踪维护改动的widgets和elements.
+  
+   - 它内部维护了两个list:
+      - _InactiveElements
+        - 严格来说这是一个内部定义了一个list的类
+        - 存储处于inactive状态的element
+      - _dirtyElements
+        - 存储需要重新被构建的element
+    
+   - 还定义了两个重要方法
+      - scheduleBuildFor
+        - 由element实例调用,把自己添加进_dirtyElements
+        ```dart
+          void scheduleBuildFor(Element element) {
+            if (!_scheduledFlushDirtyElements && onBuildScheduled != null) {
+              _scheduledFlushDirtyElements = true;
+              onBuildScheduled();
+            }
+            _dirtyElements.add(element);
+            element._inDirtyList = true;
+          }
+        ```
+        在StateFulWidget中调用setState刷新UI的时候其实调用的就是这个方法,setState把一个element插入到_dirtyElements中,并发出一帧的请求来重新build在\_dirtyElements中的元素
+        ```dart
+        //setState方法
+          void setState(VoidCallback fn) {
+            ...
+            _element.markNeedsBuild();
+          }
+        //markNeedsBuild方法
+          void markNeedsBuild() {
+            _dirty = true;
+            owner.scheduleBuildFor(this);
+          }
+        ```
+        
+      - buildScope
+        - 重构_dirtyElements中的element,会根据element的类型不同调用不同performBuild
+        - 这个方法一般会在onDrawFrame的回调里调用,因为这个WidgetsBinding重写了RendererBinding里的drawFrame方法
+        ```dart
+            @override
+            void drawFrame() {
+              ...
+              buildOwner.buildScope(renderViewElement);
+              super.drawFrame();
+              buildOwner.finalizeTree();
+            }
+        ```
+        可以发现在PipelineOwner调用drawFrame之前会调用buildScope方法,在PipelineOwner调用drawFrame之后会调用finalizeTree方法,也就是说其实在渲染流水线的Layout阶段之前其实还有一个Build阶段,这个Build阶段主要就是用来更新widgets和render object的.
+        
+        所以当用widgets framework对渲染层进行包装形成响应式的时候一个更完整的渲染流水线应该是这样的
+        
+        ![newpipe](./images/newpipe.png)
+
+以上一个Flutter应用基于Widgets Framework的初始化工作就完成了,紧接着在runApp中做的第二件事情就是调用scheduleAttachRootWidget函数
+
 ```dart
- @protected
-  void scheduleAttachRootWidget(Widget rootWidget) {
-    Timer.run(() {
-      attachRootWidget(rootWidget);
-    });
+    void scheduleAttachRootWidget(Widget rootWidget) {
+      Timer.run(() {
+        attachRootWidget(rootWidget);
+      });
+    }
+
+    void attachRootWidget(Widget rootWidget) {
+      _readyToProduceFrames = true;
+      _renderViewElement = RenderObjectToWidgetAdapter<RenderBox>(
+        container: renderView,
+        debugShortDescription: '[root]',
+        child: rootWidget,
+      ).attachToRenderTree(buildOwner, renderViewElement as RenderObjectToWidgetElement<RenderBox>);
   }
 ```
-挂载根节点的操作是在一个异步队列Timer.run中调用attachRootWidget方法进行的
-```dart
- void attachRootWidget(Widget rootWidget) {
-    _readyToProduceFrames = true;
-    _renderViewElement = RenderObjectToWidgetAdapter<RenderBox>(
-      container: renderView,
-      debugShortDescription: '[root]',
-      child: rootWidget,
-    ).attachToRenderTree(buildOwner, renderViewElement as RenderObjectToWidgetElement<RenderBox>);
-  }
-```
-在attachRootWidget中就是做了一个通过attachToRenderTree方法的返回值为\_renderViewElement变量赋值的操作_renderViewElement是一个Element类型,代表Element树的根结点.
 
-attatchToRenderTree方法是RenderObjectToWidgetAdapter这个widget适配器的一个方法,它起到一个桥梁作用,把RenderObject、Element还有Widget本身关联起来
+这里的名字起的很有意思,attachRootWidget、attachToRenderTree和传递的参数名字:container、child.
 
-RenderObjectToWidgetAdapter的构造函数主要有两个参数
+按字面意思widget是子,render object是容器,所以要attatch widget.从这种命名上可以窥见Flutter作者对render object和widget的心理定位:widget只是用来配置render object的附属.
 
-- container
-  - 是在RendererBinding中初始化时赋过值的renderView变量,也就是render tree的根节点
-- child
-  - runApp中传入的根widget
+所以说如果没有响应式这一层Framework,Flutter中的树结构应该是很直观和很好理解的,就一棵render tree,这个render tree上的每个节点都有引擎如何渲染的描述信息,但是在加入了响应式这一层Framework后情况就变得有些复杂了.
+
+有了Widgets Framework这一层后Flutter和我们直接打交道的就不再是渲染层而是widgets层.就好像用了React后,我们就很少和真实的DOM树打交道也很少会调用appendChild、createElement这样的接口,而是直接使用Componet这样的组件.Component就相当于Widget,是个配置对象,这个配置对象会被createElement转化成VirtualDOM,最后通过render函数渲染成真实的DOM,也就是说VirtualDOM是Component和DOM之间的桥梁.
+
+同样的,在FLutter中,Element就是Widget和RenderObject之间的桥梁,Widget也会被一个名为createElement的函数转化成一个Element,最后通过buildScope把配置信息更新到RenderObject上.
+
+在attachToRenderTree中,就是创建了一个类型为RenderObjectToWidgetElement的Element根结点,然后再调用buildScope函数把element上的widget信息更新到render tree中.
 
 ```dart
-RenderObjectToWidgetElement<T> attachToRenderTree(BuildOwner owner, [ RenderObjectToWidgetElement<T> element ]) {
+    RenderObjectToWidgetElement<T> attachToRenderTree(BuildOwner owner, [ RenderObjectToWidgetElement<T> element ]) {
     if (element == null) {
       owner.lockState(() {
         element = createElement();
@@ -430,94 +485,30 @@ RenderObjectToWidgetElement<T> attachToRenderTree(BuildOwner owner, [ RenderObje
       owner.buildScope(element, () {
         element.mount(null, null);
       });
-      // This is most likely the first time the framework is ready to produce
-      // a frame. Ensure that we are asked for one.
       SchedulerBinding.instance.ensureVisualUpdate();
     } else {
       element._newWidget = this;
       element.markNeedsBuild();
     }
     return element;
-}
-```
-
-可以看到attatchToRenderTree主要就是返回了一个createElement方法创建的element
-
-```dart
- @override
-  RenderObjectToWidgetElement<T> createElement() => RenderObjectToWidgetElement<T>(this);
-```
-
-方法中的RenderObjectToWidgetElement继承自RootRenderObjectElement,同时RootRenderObjectElement  >> RenderObjectElement >> Element
-
-RenderObjectToWidgetElement的构造函数传入了this这个widget适配器本身
-
-在RenderObjectElement中调用了RenderObjectToWidgetAdapter的createRenderObject方法对\_renderObject进行了赋值,赋的值就是传给RenderObjectToWidgetAdapter构造函数的container参数,也就是根render object
-
-in RenderObjectElement:
-```dart
-  @override
-  RenderObject get renderObject => _renderObject;
-  _renderObject = widget.createRenderObject(this);
-```
-in RenderObjectToWidgetAdapter:
-```dart
-@override
-  RenderObjectWithChildMixin<T> createRenderObject(BuildContext context) => container;
-```
-
-在Element类中,对\_widget变量进行了赋值,这个widget就是前面调用createElement时传入的this,也就是RenderObjectToWidgetAdapter本身
-```dart
-Element(Widget widget)
-    : assert(widget != null),
-      _widget = widget;
-
-```
-
-所以_renderViewElement是一个包含了widget和renderObject属性的Element变量.这样widget、element、renderObject就关联了起来.
-
-紧接着就是执行scheduleWarmUpFrame方法开始渲染流水线,在不等Vsync到来的情况下直接渲染出第一帧frame发送给engine.
-
-handleBeginFrame、handleDrawFrame这些任务队列就很熟悉了
-
-```dart
-  void scheduleWarmUpFrame() {
-    if (_warmUpFrame || schedulerPhase != SchedulerPhase.idle)
-      return;
-
-    _warmUpFrame = true;
-    Timeline.startSync('Warm-up frame');
-    final bool hadScheduledFrame = _hasScheduledFrame;
-    // We use timers here to ensure that microtasks flush in between.
-    Timer.run(() {
-      assert(_warmUpFrame);
-      handleBeginFrame(null);
-    });
-    Timer.run(() {
-      assert(_warmUpFrame);
-      handleDrawFrame();
-      // We call resetEpoch after this frame so that, in the hot reload case,
-      // the very next frame pretends to have occurred immediately after this
-      // warm-up frame. The warm-up frame's timestamp will typically be far in
-      // the past (the time of the last real frame), so if we didn't reset the
-      // epoch we would see a sudden jump from the old time in the warm-up frame
-      // to the new time in the "real" frame. The biggest problem with this is
-      // that implicit animations end up being triggered at the old time and
-      // then skipping every frame and finishing in the new time.
-      resetEpoch();
-      _warmUpFrame = false;
-      if (hadScheduledFrame)
-        scheduleFrame();
-    });
-
-    // Lock events so touch events etc don't insert themselves until the
-    // scheduled frame has finished.
-    lockEvents(() async {
-      await endOfFrame;
-      Timeline.finishSync();
-    });
   }
 ```
+
+render tree中的渲染信息已万事俱备,就差一个垂直同步信号来一场渲染流水线render出画面来,但是在runApp里已经迫不及待了,不等垂直信号而是调用了scheduleWarmUpFrame函数直接开启一个Rendering Pipeline渲染出首屏.
+```dart
+    void scheduleWarmUpFrame() {
+      ...  
+      Timer.run(() {
+        handleBeginFrame(null);
+      });
+      Timer.run(() {
+        handleDrawFrame();
+      });
+      ...
+  }
+```
+
+
 
 ### Widget
 
