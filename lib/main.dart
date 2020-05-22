@@ -59,12 +59,12 @@ class _GEViewState extends State<GEView> {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
     <title>APM</title>
     <style>
         body{
-            width:100vw;
-            height:100vh;
+            width:100%;
+            height:100%;
             background-color: black;
             display:flex;
             flex-direction:column;
@@ -72,11 +72,14 @@ class _GEViewState extends State<GEView> {
             align-items: center;
             font-size: 2vmin;
             user-select: none;
-
+            position:fixed;
+            top:0;
+            left:0;
+            overflow:hidden;
         }
         .record{
             width:6em;
-            height:4em;
+            height:3em;
             display:flex;
             justify-content: center;
             align-items:center;
@@ -86,30 +89,101 @@ class _GEViewState extends State<GEView> {
             font-size:20px;
             user-select: none;
             position:relative;
+            animation:
         }
+
         .record:after{
-          content:'',
+          content:'';
           position:absolute;
           width:100%;
           height:100%;
           top:0;
           left:0;
         }
+        .box {
+            background: lightcyan;
+            border-radius: 1em;
+            height: 7em;
+            width: 17em;
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .wifi-symbol {
+            width: 50px;
+            height: 50px;
+            box-sizing: border-box;
+            overflow: hidden;
+            transform: rotate(135deg);
+
+        }
+        .wifi-circle {
+            border: 5px solid #999999;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .first {
+            width: 5px;
+            height: 5px;
+            background: #cccccc;
+            top: 45px;
+            left: 45px;
+        }
+
+        .second {
+            width: 25px;
+            height: 25px;
+            top: 35px;
+            left: 35px;
+            display:none;
+        }
+
+        .third {
+            width: 40px;
+            height: 40px;
+            top: 25px;
+            left: 25px;
+            display:none;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="recorebutton" class="record">按住录音</div>
-     <div id="playbutton" class="record">播放</div>
+     <div id="playbutton" class="box">
+        <div class="wifi-symbol">
+            <div class="wifi-circle first"></div>
+            <div class="wifi-circle second"></div>
+            <div class="wifi-circle third"></div>
+        </div>
+    </div>
     <script>
         var _btn = document.getElementById('recorebutton');
         var _play = document.getElementById('playbutton');
         _btn.addEventListener('touchstart',function(e){
-            GERecord.postMessage('recordStart')
+            e.preventDefault();
+            GERecord.postMessage('recordStart');
+            return false;
         });
         _btn.addEventListener('touchend',function(e){
             GERecord.postMessage('recordStop')
         });
         _play.addEventListener('touchend',function(e){
+            document.querySelector('.second').style.animation = 'animation: fadeInOut 1s infinite 0.2s';
+             document.querySelector('.second').style.display = 'block';
+            document.querySelector('.third').style.animation = 'fadeInOut 1s infinite 0.4s';
+            document.querySelector('.third').style.display = 'block';
             GERecord.postMessage('recordPlay')
         });
     </script>
