@@ -35,15 +35,15 @@ void main() =>
         // )
         );
 
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(appBar: AppBar(title: Text('Learning')), body: WrapDemo()),
-//       // theme: ThemeData(primarySwatch: Colors.lightBlue)
-//     );
-//   }
-// }
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: null),
+      // theme: ThemeData(primarySwatch: Colors.lightBlue)
+    );
+  }
+}
 
 class GEView extends StatefulWidget {
   GEView({Key key}) : super(key: key);
