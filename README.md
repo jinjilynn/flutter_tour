@@ -6,13 +6,13 @@ Flutter是一个由谷歌开发的开源UI框架，用于为Android、iOS、 Win
 
 ![fsen](./images/fsen.png)
 
-Flutter采用自绘引擎的方式进行UI渲染,也就是底层会调用OpenGL这种跨平台的绘制引擎直接为GPU提供绘制数据,所以其性能会大于等于原生组件的性能.
+Flutter采用自绘引擎的方式进行UI渲染,也就是底层会调用Skia、OpenGL这种跨平台的绘制引擎直接为GPU提供绘制数据,所以其性能会大于等于原生组件的性能.
 
 采用自绘引擎的方式会带来两个好处:一个是平台无关性;一个是操作系统版本的无关性.
 
 平台无关性是说在Android、ios、Windows、Mac、Linux、Fushia等操作系统中UI会有良好的一致性体验.这个很好理解,因为各个平台的显示原理与OpenGL引擎的表现是一致的.
 
-操作系统版本无关性就是说操作系统的不同版本对UI的绘制几乎没有影响,因为Flutter的UI绘制并不是使用与操作系统版本具有强相关的组件进行绘制的,也就不会有因为操作系统升级而导致的组件渲染差异所带来的一些奇奇怪怪的bug困扰.
+操作系统版本无关性就是说操作系统的不同版本对UI的绘制(系统提供的功能除外)几乎没有影响,因为Flutter的UI绘制并不是使用与操作系统版本具有强相关的组件进行绘制的,也就不会有因为操作系统升级而导致的组件渲染差异所带来的一些奇奇怪怪的bug困扰.
 
 ### Flutter架构
 
@@ -507,8 +507,15 @@ render tree中的渲染信息已万事俱备,就差一个垂直同步信号来�
       ...
   }
 ```
+### Widget、Element、RenderObject
 
+在前面的描述中可以知道Widget和Element是属于响应式层面的概念,而RenderObject是属于渲染层面的概念.
 
+Widget是配置对象,RenderObject是被引擎渲染的对象,Element是Widget和RenderObject之间的桥梁.所以要理解这三个概念需要从Element开始.
+
+- #### Element
+
+  官方对Element的解释是An instantiation of a [Widget] at a particular location in the tree,按字面意思是说它是树上的某个widget的实例,
 
 ### Widget
 
