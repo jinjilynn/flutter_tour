@@ -181,7 +181,7 @@ class _GEViewState extends State<GEView> {
         });
         _play.addEventListener('touchend',function(e){
             document.querySelector('.second').style.animation = 'animation: fadeInOut 1s infinite 0.2s';
-             document.querySelector('.second').style.display = 'block';
+            document.querySelector('.second').style.display = 'block';
             document.querySelector('.third').style.animation = 'fadeInOut 1s infinite 0.4s';
             document.querySelector('.third').style.display = 'block';
             GERecord.postMessage('recordPlay')
