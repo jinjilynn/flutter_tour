@@ -611,28 +611,31 @@ Widget是配置对象,RenderObject是被引擎渲染的对象,Element是Widget�
     - _child
 
       这个属性表明在ComponentElement下面是存在子节点的,这个子节点就是通过build返回的[widget]创建的element,在updateChild中可以找到这么一段代码,代码中newWidget就是build方法的返回值
-  ```dart
-      Element inflateWidget(Widget newWidget, dynamic newSlot) {
-        final Element newChild = newWidget.createElement();
-        newChild.mount(this, newSlot);
-        return newChild;
-      }
-    
-      //override by ComponentElement
-  void performRebuild() {
-        Widget built;
-        built = build();
-        _child = updateChild(_child, built, slot);
-      }  
+      
+      ```dart
+        Element inflateWidget(Widget newWidget, dynamic newSlot) {
+          final Element newChild = newWidget.createElement();
+          newChild.mount(this, newSlot);
+          return newChild;
+        }
+        //override by ComponentElement
+        void performRebuild() {
+          Widget built;
+          built = build();
+          _child = updateChild(_child, built, slot);
+        }  
       ```
+
       由此也可以得出一个结论,Element树其实是一棵组件树,也就是ComponentElement树.
       
     - build
       这个build返回一个配置widget,但它需要被ComponentElement的子类重写.其实这个build最终调用的是widget中定义的那个build
+      
       ```dart
        @override
        Widget build() => widget.build(this);
       ```
+      
   
   
 
