@@ -511,11 +511,150 @@ render tree中的渲染信息已万事俱备,就差一个垂直同步信号来�
 
 在前面的描述中可以知道Widget和Element是属于响应式层面的概念,而RenderObject是属于渲染层面的概念.
 
-Widget是配置对象,RenderObject是被引擎渲染的对象,Element是Widget和RenderObject之间的桥梁.先说结论,Flutter一共存在两棵树,有几个Owner就有几棵树,有PipelineOwner和BuildOwner这两个Owner就有,RenderTree和ElementTree这两棵树,Widget只是这两棵树使用的配置对象.所以要理解这三个概念需要从Element开始.
+Widget是配置对象,RenderObject是被引擎渲染的对象,Element是Widget和RenderObject之间的桥梁.先说结论,Flutter一共存在两棵树,有几个Owner就有几棵树,有PipelineOwner和BuildOwner这两个Owner,就有RenderTree和ElementTree这两棵树,Widget只是这两棵树使用的配置对象.所以要理解这三个概念需要从Element开始.
 
 - #### Element
 
-  官方对Element的解释是An instantiation of a [Widget] at a particular location in the tree,按字面意思是说它是树上的某个widget的实例,
+  官方对Element的解释是An instantiation of a [Widget] at a particular location in the tree,按字面意思是说它是树上的某个widget的实例,这种描述其实并不准确,因为Element毕竟不是Widget类的实例,之所以这么说是因为Element是用Widget中定义的createElement创造的.
+
+  ```dart
+  abstract class Element implements BuildContext {
+    Element _parent;
+  
+    Widget get widget => _widget;
+    Widget _widget;
+  
+    BuildOwner get owner => _owner;
+    BuildOwner _owner;
+  
+    RenderObject get renderObject 
+  
+    Element updateChild(Element child, Widget newWidget, dynamic newSlot)
+  
+    void mount(Element parent, dynamic newSlot)
+  
+    void markNeedsBuild()
+  
+    void rebuild()
+  
+    void unmount()
+  }
+  ```
+  参考Element定义的源码可以注意到几个重要的属性和方法
+
+  - _parent
+
+    - 有_parent就说明了Element确实是一棵树,代表了父节点的引用
+
+  - widget
+
+    - 每个Element都会持有它的配置对象Widget
+
+  - owner
+
+    - 每个Element都会持有一个BuildOwner,这个是在WidgetBinding中初始化的
+
+  - renderObject
+
+    - 所有的Element都会有renderObject属性,但只有element的类型为RenderObjectElement时,其值才不会为null
+    
+  - updateChild
+    
+    - 根据新传入的widget配置更新element的方法,更新规则如下
+    |                   | **newWidget == null**               | **newWidget != null**                                          |
+    | :---------------: | :---------------------------------- | :-----------------------------------------------------------   |
+    | **child == null** | Returns null.                       | Returns new [Element].                                         |
+    | **child != null** | Old child is removed, returns null. | Old child updated if possible, returns child or new [Element]. |
+    根据原来child的有无和传入新widget的有无,共分了四种情况,这个方法会在rebuild中被调用
+    
+  - mount
+
+    - 新创建的element第一次被挂载到父节点的时候会被调用
+
+  - markNeedsBuild
+
+    - 标记element为脏数据,并把它放进BuildOwner维护的一个全局的脏列表_dirtyElements里,调用前面owner属性的scheduleBuildFor方法就可以完成
+
+  - rebuild
+
+    - 第一次加载和widget改变都会调用这个方法重新构建element.在一次RenderPipeline中由BuildOwner遍历脏列表时在buildScope方法中发起调用
+
+  - unmount
+
+    - 卸载element
+
+  通过以上属性和方法可以感知到Element好像是有一个生命周期的,事实上这个生命周期确实是存在的,但这个生命周期一般只会被Framework使用到
+  ```dart
+    enum _ElementLifecycle {
+      initial, //初始化
+      active, //活跃态,在屏幕上可见
+      inactive, //非活跃态,在屏幕上不可见,但存在于内存中
+      defunct, //废止
+    }
+  ```
+
+  在Element下面还有两种抽象子类ComponentElement和RenderObjectElement
+
+  - ComponentElement
+    这种类型的Element是一个起到包装作用的Element,主要通过封装一些逻辑来组合其他Element.
+    
+    ```dart
+      abstract class ComponentElement extends Element {
+        Element _child;
+        Widget build();
+      }
+    ```
+    通过源码的可以发现,ComponentElement主要多了一个_child属性和一个build方法
+    
+    - _child
+
+      这个属性表明在ComponentElement下面是存在子节点的,这个子节点就是通过build返回的[widget]创建的element,在updateChild中可以找到这么一段代码,代码中newWidget就是build方法的返回值
+  ```dart
+      Element inflateWidget(Widget newWidget, dynamic newSlot) {
+        final Element newChild = newWidget.createElement();
+        newChild.mount(this, newSlot);
+        return newChild;
+      }
+    
+      //override by ComponentElement
+  void performRebuild() {
+        Widget built;
+        built = build();
+        _child = updateChild(_child, built, slot);
+      }  
+      ```
+      由此也可以得出一个结论,Element树其实是一棵组件树,也就是ComponentElement树.
+      
+    - build
+      这个build返回一个配置widget,但它需要被ComponentElement的子类重写.其实这个build最终调用的是widget中定义的那个build
+      ```dart
+       @override
+       Widget build() => widget.build(this);
+      ```
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Widget
 
