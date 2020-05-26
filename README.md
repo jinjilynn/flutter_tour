@@ -561,10 +561,12 @@ Widget是配置对象,RenderObject是被引擎渲染的对象,Element是Widget�
   - updateChild
     
     - 根据新传入的widget配置更新element的方法,更新规则如下
+
     |                   | **newWidget == null**               | **newWidget != null**                                          |
     | :---------------: | :---------------------------------- | :-----------------------------------------------------------   |
     | **child == null** | Returns null.                       | Returns new [Element].                                         |
     | **child != null** | Old child is removed, returns null. | Old child updated if possible, returns child or new [Element]. |
+    
     根据原来child的有无和传入新widget的有无,共分了四种情况,这个方法会在rebuild中被调用
     
   - mount
