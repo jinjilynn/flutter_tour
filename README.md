@@ -58,7 +58,7 @@ window对象提供了窗口尺寸、事件注册、网络请求等一些服务.
 
 而Flutter渲染所关注的就是在下一次垂直信号到来之前(两次Vsync之间)尽可能快的计算出下一帧图像数据并交给GPU.
 
-##### 换句话说,Flutter的渲染动作完全是依靠垂直信号(Vsync)来驱动的(除了第一次),记住这一点很重要,因为不论是通过setState更新UI还是UI动画的渲染,都是依靠不断请求Vsync来驱动进行的.
+换句话说,Flutter的渲染动作完全是依靠垂直信号(Vsync)来驱动的(除了第一次),记住这一点很重要,因为不论是通过setState更新UI还是UI动画的渲染,都是依靠不断请求Vsync来驱动进行的.
 
 ![vsync](./images/flutter_draw.png)
 
@@ -95,7 +95,7 @@ Vsync信号到达engine层时,engine会调用 window.onBeginFrame回调,此时Re
 
 下面通过runApp入口函数来具体看一下渲染流水线的各个阶段.
 
-### Flutter入口-runApp函数
+### runApp函数
 
 runApp函数的官方解释是Inflate the given widget and attach it to the screen.The widget is given constraints during layout that force it to fill the entire screen.
 
@@ -507,15 +507,15 @@ render tree中的渲染信息已万事俱备,就差一个垂直同步信号来�
       ...
   }
 ```
-### Widget、Element、RenderObject
+### Element
 
 在前面的描述中可以知道Widget和Element是属于响应式层面的概念,而RenderObject是属于渲染层面的概念.Widget是配置对象,RenderObject是被渲染引擎渲染的对象,Element是Widget和RenderObject之间的桥梁.
 
-先说结论,在Flutter中一共存在两棵树,有几个Owner就有几棵树.有PipelineOwner和BuildOwner这两个Owner,就有RenderTree和ElementTree这两棵树,Widget只是这两棵树使用的配置对象.要理解这三个概念需要从Element开始,Element是一切渲染逻辑的入口,因为Rendering Pipeline的入口就是操作的element.
+先说结论,在Flutter中一共存在两棵树,有几个Owner就有几棵树.有PipelineOwner和BuildOwner这两个Owner,就有RenderTree和ElementTree这两棵树,Widget只是这两棵树使用的配置对象.要理解这三个概念的关系需要从Element开始,因为Element是渲染逻辑的入口,Rendering Pipeline就是通过遍历dirty elements来完成的.
 
-- #### Element
+#### 定义
 
-  官方对Element的解释是An instantiation of a [Widget] at a particular location in the tree,按字面意思是说它是树上的某个widget的实例,这种描述其实并不准确,因为Element毕竟不是Widget类的实例,之所以这么说是因为Element是用Widget中定义的createElement创建的.一种类型的widget与其类型相应的element是一一对应的.
+官方对Element的解释是An instantiation of a [Widget] at a particular location in the tree,按字面意思是说它是树上的某个widget的实例,这种描述其实并不准确,因为Element毕竟不是Widget类的实例,之所以这么说是因为Element是用Widget中定义的createElement创建的.一种类型的widget对应一个相应的element.
 
   ```dart
   abstract class Element implements BuildContext {
@@ -560,7 +560,7 @@ render tree中的渲染信息已万事俱备,就差一个垂直同步信号来�
     
   - updateChild
     
-    - 根据新传入的widget配置更新element的方法,更新规则如下
+    - 根据新widget更新子element的方法,更新规则如下
 
     |                   | **newWidget == null**               | **newWidget != null**                                          |
     | :---------------: | :---------------------------------- | :-----------------------------------------------------------   |
@@ -585,213 +585,348 @@ render tree中的渲染信息已万事俱备,就差一个垂直同步信号来�
 
     - 卸载element
 
-  通过以上属性和方法可以感知到Element好像是有一个生命周期的,事实上这个生命周期确实是存在的,但这个生命周期一般只会被Framework使用到
+通过以上属性和方法可以感知到Element好像是有一个生命周期的,事实上这个生命周期确实是存在的,但这个生命周期一般只会被Framework使用到
   ```dart
     enum _ElementLifecycle {
       initial, //初始化
-      active, //活跃态,在屏幕上可见
-      inactive, //非活跃态,在屏幕上不可见
+      active,  //活跃态,在屏幕上可见
+      inactive,//非活跃态,在屏幕上不可见
       defunct, //废止态,再也不见
     }
   ```
 
-  在Element下面还有两种抽象子类ComponentElement和RenderObjectElement,就是说Flutter中存在两种element.
+Element类是个抽象类,是不能直接被使用的,所以在Flutter中定义了两种继承自Element的抽象子类ComponentElement和RenderObjectElement.
 
-  - ComponentElement
-    这种类型的Element是一个起到包装作用的Element,主要通过封装一些逻辑来组合其他Element.
+#### ComponentElement
+这种类型的Element是一个起到包装作用的父Element容器,主要通过封装一些逻辑来管理其子Element.
 
+  ```dart
+    abstract class ComponentElement extends Element {
+      Element _child;
+      Widget build();
+    }
+  ```
+  通过源码可以发现,ComponentElement主要多了一个_child属性和一个build方法
+
+  - _child
+
+    这个属性表明在ComponentElement下面存在一个Element类型的子节点,这个子节点就是通过build返回的widget创建的.
+    
+    具体的创建过程定义在了inflateWidget中:
+    
     ```dart
-      abstract class ComponentElement extends Element {
-        Element _child;
-        Widget build();
-      }
+      Element inflateWidget(Widget newWidget, dynamic newSlot) {
+        final Element newChild = newWidget.createElement();
+        newChild.mount(this, newSlot);
+        return newChild;
+    }
     ```
-    通过源码可以发现,ComponentElement主要多了一个_child属性和一个build方法
+    
+    由此也可以得出一个结论,Element树其实是一棵组件树,也就是ComponentElement树.
+    
+  - build
 
-    - _child
+    这个build返回一个新widget,这个需要被所有子类重写.
 
-      这个属性表明在ComponentElement下面是存在子节点的,这个子节点就是通过build返回的[widget]创建的element,在updateChild中可以找到这么一段代码,代码中newWidget就是build方法的返回值
+ComponentElement也是一个抽象类,同样不能被直接使用,所以又定义了三种继承自ComponentElement的子类StatelessElement、StatefulElement、ProxyElement.
+
+##### StatelessElement
+
+  ```dart
+    class StatelessElement extends ComponentElement {
+      @override
+      Widget build() => widget.build(this);
+    }
+  ```
+
+StatelessElement是以StatelessWidget为配置对象的Element,它会通过Widget.createElement()方法被创建.
+
+这个Element主要重写了build方法,这个build方法调用了对应widget的build方法,在调用的时候会把element本身当作参数传进方法中,所以在widget的build方法中看到的BuildContext形参就是这个element实例.
+
+build会在element实例中的performRebuild方法中被调用,StatelessElement拿到build返回的widget后会对子节点进行创建、更新等操作.
+
+  ```dart
+    void performRebuild() {
+      Widget built;
+      built = build();
+      _child = updateChild(_child, built, slot);
+    }  
+  ```
+
+##### StatefulElement
+
+  ```dart
+  class StatefulElement extends ComponentElement {
       
-      ```dart
-        Element inflateWidget(Widget newWidget, dynamic newSlot) {
-          final Element newChild = newWidget.createElement();
-          newChild.mount(this, newSlot);
-          return newChild;
+        StatefulElement(StatefulWidget widget): _state = widget.createState(),super(widget) {
+              _state._element = this;
+              _state._widget = widget;
         }
-      ```
-
-      由此也可以得出一个结论,Element树其实是一棵组件树,也就是ComponentElement树.
       
-    - build
-
-      这个build返回一个配置widget,这个widget
-      但它需要被ComponentElement的子类重写.其实这个build最终调用的是widget中定义的那个build
-
+        @override
+        Widget build() => _state.build(this);
+      
+        State<StatefulWidget> get state => _state;
+        State<StatefulWidget> _state;
   
-
-    在实际的应用中我们几乎不会直接接触到ComponentElement的,毕竟这也是一个抽象类,而是使用它的三个子类:
-
-    - StatelessElement
-
-      ```dart
-        class StatelessElement extends ComponentElement {
-          @override
-          Widget build() => widget.build(this);
+        void _firstBuild() {
+          final dynamic debugCheckForReturnedFuture = _state.initState() as dynamic; 
+          _state.didChangeDependencies();
+          super._firstBuild();
         }
-      ```
-
-      StatelessElement就是StatelessWidget这个无状态Widget所对应的Element,它会通过Widget.createElement()方法被创建.
-
-      这个Element主要重写了build方法,这个build方法调用了对应widget的build方法,在调用的时候会把element本身当作参数传进方法中,所以在widget的build方法中看到的BuildContext形参就是一个element实例.
-
-      build会在element实例中的performRebuild方法中被调用,StatelessElement拿到build返回的widget后会对子节点进行创建、更新等操作.
-
-      ```dart
+      
+        @override
+        void reassemble() {
+          state.reassemble();
+          super.reassemble();
+        }
+      
+        @override
         void performRebuild() {
-          Widget built;
-          built = build();
-          _child = updateChild(_child, built, slot);
-        }  
-      ```
-
-    - StatefulElement
-
-      ```dart
-       class StatefulElement extends ComponentElement {
-         
-           StatefulElement(StatefulWidget widget): _state = widget.createState(),super(widget) {
-                 _state._element = this;
-                 _state._widget = widget;
-           }
-         
-           @override
-           Widget build() => _state.build(this);
-         
-           State<StatefulWidget> get state => _state;
-           State<StatefulWidget> _state;
-      
-           void _firstBuild() {
-             final dynamic debugCheckForReturnedFuture = _state.initState() as dynamic; 
-             _state.didChangeDependencies();
-             super._firstBuild();
-           }
-         
-           @override
-           void reassemble() {
-             state.reassemble();
-             super.reassemble();
-           }
-         
-           @override
-           void performRebuild() {
-             if (_didChangeDependencies) {
-               _state.didChangeDependencies();
-               _didChangeDependencies = false;
-             }
-           super.performRebuild();
-           }
-      
-           @override
-           void update(StatefulWidget newWidget) {
-             super.update(newWidget);
-             final StatefulWidget oldWidget = _state._widget;
-             _dirty = true;
-             _state._widget = widget as StatefulWidget;
-             try {
-               _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
-               final dynamic debugCheckForReturnedFuture = _state.didUpdateWidget(oldWidget) as dynamic;
-             } finally {
-               _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
-             }
-             rebuild();
-           }
-         
-           @override
-           void activate() {
-             super.activate();
-             markNeedsBuild();
-           }
-         
-           @override
-           void deactivate() {
-             _state.deactivate();
-             super.deactivate();
-           }
-         
-           @override
-           void unmount() {
-             super.unmount();
-             _state.dispose();
-             _state._element = null;
-             _state = null;
-           }
-         
-           @override
-           InheritedWidget inheritFromElement(Element ancestor, { Object aspect }) {
-             return dependOnInheritedElement(ancestor, aspect: aspect);
-           }
-         
-           @override
-           InheritedWidget dependOnInheritedElement(Element ancestor, { Object aspect }) {
-             return super.dependOnInheritedElement(ancestor as InheritedElement, aspect: aspect);
-           }
-         
-           @override
-           void didChangeDependencies() {
-             super.didChangeDependencies();
-             _didChangeDependencies = true;
-           }
-      }
-      ```
-
-      这个StatefulElement就是StatefulWidget这个有状态widget对应的Element,它会通过Widget.createElement()方法被创建.
-
-      在源码中可以发现在StatefulElement内部重写了build方法,这个build方法调用的是\_state.build而不是widget.build,这也是为什么有状态widget的build要在state中重写而不在widget中重写.
-
-      同时在element的内部还调用了widget.createState、\_state.initState()、\_state.reassemble()、\_state.didChangeDependencies()、\_state.didUpdateWidget(oldWidget)、\_state.deactivate()、_state.dispose()等方法,这些不正是state的几个生命周期嘛,在这里可以清楚的看到各个生命周期执行的时机.
-
-      - widget.createState
-
-        创建state实例的阶段,在调用widget.createElement对element进行初始化的时候会调用一次
-
-      - \_state.initState()
-
-        初始化state阶段,这个方法在\_firstBuild中被触发,并且在state.build调用之前,也就是element还没开始挂载到树上.
-
-      - \_state.didChangeDependencies()
-
-        state的依赖完成改变阶段,这个方法会在\_firstBuild和performRebuild中触发:
-
-        - 在_firstBuild中会紧随initState方法之后调用一次,同样也是在state.build调用之前发生.
-        - 当重绘时在performRebuild方法中会有一次调用,也是会在state.build调用之前发生
-
-      - \_state.reassemble()
-
-        这是个会在开发阶段触发的一个热重载阶段,又Flutter的底层foundation层通过BuildOwner触发,这个阶段会发生在重新build之前,比didChangeDependencies阶段还要早
-
-      - \_state.didUpdateWidget(oldWidget)
-
-        更新完widget后触发,这个函数会把old widget作为参数传进来.这个阶段的触发在state.build调用之后
-
-      - \_state.deactivate()
-
-        state的非活跃阶段,这个方法会在performRebuild中触发并且是在state.build调用之后,但触发条件要分两种情况:
-
-        - 移除一个element,也就是新widget为null,旧widget不为null,会调用deactivate方法,后续的didUpdateWidget阶段不会存在.
-        - 改变一个element,也就是新widget与就widget不是同一个类型的widget或者key值不一样,也会调用deactivate方法
-
-      - _state.dispose()
-
-        - state的释放阶段,处于非活跃状态的element在一次rendering pipeline结尾如果仍然没有被重新放回到树中,则在Finalization中会卸载有所有的element,在卸载之前会触发state的dispose方法.
-
-      现在可以通过element来总结一下State的生命周期
-
-      ​	![state_cycle](./images/state_cycle.png)
-
-      
-
-- ProxyElement
+          if (_didChangeDependencies) {
+            _state.didChangeDependencies();
+            _didChangeDependencies = false;
+          }
+        super.performRebuild();
+        }
   
+        @override
+        void update(StatefulWidget newWidget) {
+          super.update(newWidget);
+          final StatefulWidget oldWidget = _state._widget;
+          _dirty = true;
+          _state._widget = widget as StatefulWidget;
+          try {
+            _debugSetAllowIgnoredCallsToMarkNeedsBuild(true);
+            final dynamic debugCheckForReturnedFuture = _state.didUpdateWidget(oldWidget) as dynamic;
+          } finally {
+            _debugSetAllowIgnoredCallsToMarkNeedsBuild(false);
+          }
+          rebuild();
+        }
+      
+        @override
+        void activate() {
+          super.activate();
+          markNeedsBuild();
+        }
+      
+        @override
+        void deactivate() {
+          _state.deactivate();
+          super.deactivate();
+        }
+      
+        @override
+        void unmount() {
+          super.unmount();
+          _state.dispose();
+          _state._element = null;
+          _state = null;
+        }
+      
+        @override
+        InheritedWidget inheritFromElement(Element ancestor, { Object aspect }) {
+          return dependOnInheritedElement(ancestor, aspect: aspect);
+        }
+      
+        @override
+        InheritedWidget dependOnInheritedElement(Element ancestor, { Object aspect }) {
+          return super.dependOnInheritedElement(ancestor as InheritedElement, aspect: aspect);
+        }
+      
+        @override
+        void didChangeDependencies() {
+          super.didChangeDependencies();
+          _didChangeDependencies = true;
+        }
+  }
+  ```
+
+StatefulElement是以StatefulWidget为配置对象的Element,它会通过Widget.createElement()方法被创建.
+
+在源码中可以发现在StatefulElement内部重写了build方法,这个build方法调用的是\_state.build而不是widget.build,这也是为什么StatefulWidget的build要在State中重写而不在StatefulWidget中重写.
+
+同时在element的内部还调用了widget.createState、\_state.initState()、\_state.reassemble()、\_state.didChangeDependencies()、\_state.didUpdateWidget(oldWidget)、\_state.deactivate()、_state.dispose()等方法,这些不正是state的几个生命周期嘛,在这里可以清楚的看到各个生命周期执行的时机.
+
+  - widget.createState
+
+    创建state实例的阶段,在调用widget.createElement对element进行初始化的时候会调用一次
+
+  - \_state.initState()
+
+    初始化state阶段,这个方法在\_firstBuild中被触发,并且在state.build调用之前,也就是element还没开始挂载到树上.
+
+  - \_state.didChangeDependencies()
+
+    state的依赖完成改变阶段,这个方法会在\_firstBuild和performRebuild中触发:
+
+    - 在_firstBuild中会紧随initState方法之后调用一次,同样也是在state.build调用之前发生.
+    - 当重绘时在performRebuild方法中会有一次调用,也是会在state.build调用之前发生
+
+  - \_state.reassemble()
+
+    这是个会在开发阶段触发的一个热重载阶段,又Flutter的底层foundation层通过BuildOwner触发,这个阶段会发生在重新build之前,比didChangeDependencies阶段还要早
+
+  - \_state.didUpdateWidget(oldWidget)
+
+    更新完widget后触发,这个函数会把old widget作为参数传进来.这个阶段的触发在state.build调用之后
+
+  - \_state.deactivate()
+
+    state的非活跃阶段,这个方法会在performRebuild中触发并且是在state.build调用之后,但触发条件要分两种情况:
+
+    - 移除一个element,也就是新widget为null,旧widget不为null,会调用deactivate方法,后续的didUpdateWidget阶段不会存在.
+    - 改变一个element,也就是新widget与就widget不是同一个类型的widget或者key值不一样,也会调用deactivate方法
+
+  - _state.dispose()
+
+    - state的释放阶段,处于非活跃状态的element在一次rendering pipeline结尾如果仍然没有被重新放回到树中,则在Finalization中会卸载有所有的element,在卸载之前会触发state的dispose方法.
+
+  现在可以透过Element来总结一下State的生命周期
+
+  ![state_cycle](./images/state_cycle.png)
+
+##### ProxyElement
+
+ProxyElement以ProxyWidget为配置对象
+
+```dart
+abstract class ProxyElement extends ComponentElement {
+
+  @override
+  Widget build() => widget.child;
+
+  @override
+  void update(ProxyWidget newWidget) {
+    final ProxyWidget oldWidget = widget;
+    super.update(newWidget);
+    updated(oldWidget);
+    _dirty = true;
+    rebuild();
+  }
+
+  void updated(covariant ProxyWidget oldWidget) {
+    notifyClients(oldWidget);
+  }
+
+  @protected
+  void notifyClients(covariant ProxyWidget oldWidget);
+}
+```
+
+- build
+
+  既然是个ComponentElement,重写build那就是必须的.但是这里重写的方式和前两个不一样,并不是调用widget的build方法,而是返回widget的child属性.也就是在编写ProxyWidget的时候不需要重写build函数而是为其child属性赋值就可以了,采用赋值的方式返回widget也就暗示了这个child属性最好不要改变.
+
+- update
+
+  ProxyElement还重写了update函数,这个是很值得玩味的.可以先看看重写之前的update函数做了些什么
+
+  ```dart
+    void update(covariant Widget newWidget) {
+      _widget = newWidget;
+    }
+  ```
+
+  可以看到原来的update就做了一件事情,用新的的widget给_widget属性赋值.而这里多做了两件事,额外调用了updated和rebuild方法.
+  
+  在前面分析中可以得知一个element在updateChild阶段会有四种情况,只有当新旧weidget的类型和key值相同的情况下才会走update这条线路.
+
+  ```dart
+    //in Element >> updateChild
+    if (hasSameSuperclass && Widget.canUpdate(child.widget, newWidget)) {
+        if (child.slot != newSlot)
+          updateSlotForChild(child, newSlot);
+        child.update(newWidget);
+        newChild = child;
+    }
+  ```
+  
+  而这里重写update的方式也就暗示了在ProxyElement中执行updateChild时,一定要走update(widget.canUpdate为true)这条线路,否则就没什么意义了,和前两种ELement就没啥区别.要保证在updateChild时执行update就需要新旧widget的runtimeType和key值不变,也就是它的widget.child属性的类型和key不要改变.
+  
+  所以ProxyElement适合放在最顶层,它的widget.child最好放一些Scaffold这样不会被改变类型的脚手架.
+  
+- updated
+
+  单独出这么一个函数来调用notifyClients是为了方便子类可以覆写它,可以加个判断用来决定是否要调用notifyClients.
+
+- notifyClients
+
+  这是一个需要子类覆写的方法,通过名字可以看出它是一个实现了类似于消息通知的方法.
+
+  从这个方法可以看出ProxyElement存在的意义和为什么叫ProxyElement了,这个Element就是一个代理、一个不赚差价的中间商,所有的子节点都可以订阅或修改消息,它负责分发消息给对应的子节点.
+
+因为ProxyElement是个抽象类,是不能被实例化的,所以会使用到它的两个子类:
+
+- ParentDataElement
+
+  和渲染对象有关,一般不会直接使用到,暂略.
+
+- InheritedElement
+
+  这个Element可以说是非常有用,可以用它来做全局的状态管理
+  
+  ```dart
+      class InheritedElement extends ProxyElement {
+  
+          final Map<Element, Object> _dependents = HashMap<Element, Object>();
+  
+          @override
+          void _updateInheritance() {
+            assert(_active);
+            final Map<Type, InheritedElement> incomingWidgets = _parent?._inheritedWidgets;
+            if (incomingWidgets != null)
+              _inheritedWidgets = HashMap<Type, InheritedElement>.from(incomingWidgets);
+            else
+              _inheritedWidgets = HashMap<Type, InheritedElement>();
+            _inheritedWidgets[widget.runtimeType] = this;
+          }
+  
+          @override
+          void debugDeactivated() {
+            super.debugDeactivated();
+          }
+  
+  
+          @protected
+          Object getDependencies(Element dependent) {
+            return _dependents[dependent];
+          }
+  
+          @protected
+          void setDependencies(Element dependent, Object value) {
+            _dependents[dependent] = value;
+          }
+  
+          @protected
+          void updateDependencies(Element dependent, Object aspect) {
+            setDependencies(dependent, null);
+          }
+  
+          @protected
+          void notifyDependent(covariant InheritedWidget oldWidget, Element dependent) {
+            dependent.didChangeDependencies();
+          }
+  
+          @override
+          void updated(InheritedWidget oldWidget) {
+            if (widget.updateShouldNotify(oldWidget))
+              super.updated(oldWidget);
+          }
+  
+          @override
+          void notifyClients(InheritedWidget oldWidget) {
+            for (final Element dependent in _dependents.keys) {
+              notifyDependent(oldWidget, dependent);
+            }
+          }
+      }
+  ```
+  
+  
+
+
 
 
 
