@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/state-life-cycle.dart';
 // import 'package:flutter_demo/clip.dart';
 // import 'package:flutter_demo/constrainedBox.dart';
 // import 'package:flutter_demo/decoratedbox.dart';
@@ -24,22 +25,23 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_plugin_record/index.dart';
 
 void main() =>
-    runApp(Directionality(textDirection: TextDirection.ltr, child: GEView())
-        // DecoratedBox(
-        //   key: GlobalKey(),
-        //   decoration:BoxDecoration(),
-        //   child:Text(
-        //     'helloworld'*1000,
-        //     textDirection: TextDirection.ltr
-        //   )
-        // )
-        );
+    // runApp(Directionality(textDirection: TextDirection.ltr, child: GEView())
+    //     // DecoratedBox(
+    //     //   key: GlobalKey(),
+    //     //   decoration:BoxDecoration(),
+    //     //   child:Text(
+    //     //     'helloworld'*1000,
+    //     //     textDirection: TextDirection.ltr
+    //     //   )
+    //     // )
+    //     );
+    runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: null),
+      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: WrapedByProvider()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }

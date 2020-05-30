@@ -157,7 +157,7 @@ class RenderingFlutterBinding extends BindingBase with GestureBinding, ServicesB
   }
 }
 ```
-#### About Binding Mixins
+####  Binding Mixins
 
 通过这7种mixin的名字也可以知道它们的主要作用就是在初始化的过程中进行一些绑定操作,这些绑定主要就是通过绑定window实例上的某些回调来和Engin层进行通信,前面讲过window是Framework层和Engine层的粘合剂.
 
@@ -755,26 +755,26 @@ StatefulElement是以StatefulWidget为配置对象的Element,它会通过Widget.
 
   - \_state.initState()
 
-    初始化state阶段,这个方法在\_firstBuild中被触发,并且在state.build调用之前,也就是element还没开始挂载到树上.
+    初始化state阶段,这个方法在\_firstBuild中被触发,也就是element还没开始挂载到树上.
 
   - \_state.didChangeDependencies()
 
     state的依赖完成改变阶段,这个方法会在\_firstBuild和performRebuild中触发:
 
-    - 在_firstBuild中会紧随initState方法之后调用一次,同样也是在state.build调用之前发生.
-    - 当重绘时在performRebuild方法中会有一次调用,也是会在state.build调用之前发生
+    - 在_firstBuild中会紧随initState方法之后调用一次
+    - 当重绘时在performRebuild方法中会有一次调用,会在didUpdateWidget调用之后发生
 
   - \_state.reassemble()
 
-    这是个会在开发阶段触发的一个热重载阶段,又Flutter的底层foundation层通过BuildOwner触发,这个阶段会发生在重新build之前,比didChangeDependencies阶段还要早
+    这是个会在开发阶段触发的一个热重载阶段,又Flutter的底层foundation层通过BuildOwner触发,这个阶段会发生在重新build之前
 
   - \_state.didUpdateWidget(oldWidget)
 
-    更新完widget后触发,这个函数会把old widget作为参数传进来.这个阶段的触发在state.build调用之后
+    更新完widget后触发,这个函数会把old widget作为参数传进来.这个阶段的触发在_parent.build调用之后
 
   - \_state.deactivate()
 
-    state的非活跃阶段,这个方法会在performRebuild中触发并且是在state.build调用之后,但触发条件要分两种情况:
+    state的非活跃阶段,这个方法会在_parent.updateChild中触发,但触发条件要分两种情况:
 
     - 移除一个element,也就是新widget为null,旧widget不为null,会调用deactivate方法,后续的didUpdateWidget阶段不会存在.
     - 改变一个element,也就是新widget与就widget不是同一个类型的widget或者key值不一样,也会调用deactivate方法
@@ -866,62 +866,104 @@ abstract class ProxyElement extends ComponentElement {
 - InheritedElement
 
   这个Element可以说是非常有用,可以用它来做全局的状态管理
-  
+
+  现在可以从mount开始分析一下订阅的消息机制是如何工作的
+
   ```dart
-      class InheritedElement extends ProxyElement {
+      void mount(Element parent, dynamic newSlot) {
+          _updateInheritance();
+      }
+  ```
   
-          final Map<Element, Object> _dependents = HashMap<Element, Object>();
-  
-          @override
-          void _updateInheritance() {
-            assert(_active);
+  可以看到在mount中调用了_updateInheritance方法,而这个_updateInheritance方法可以在子类InheritedElement中找到
+
+  ```dart
+    Map<Type, InheritedElement> _inheritedWidgets;
+    void _updateInheritance() {
             final Map<Type, InheritedElement> incomingWidgets = _parent?._inheritedWidgets;
             if (incomingWidgets != null)
               _inheritedWidgets = HashMap<Type, InheritedElement>.from(incomingWidgets);
             else
               _inheritedWidgets = HashMap<Type, InheritedElement>();
             _inheritedWidgets[widget.runtimeType] = this;
-          }
-  
-          @override
-          void debugDeactivated() {
-            super.debugDeactivated();
-          }
-  
-  
-          @protected
-          Object getDependencies(Element dependent) {
-            return _dependents[dependent];
-          }
-  
-          @protected
-          void setDependencies(Element dependent, Object value) {
-            _dependents[dependent] = value;
-          }
-  
-          @protected
-          void updateDependencies(Element dependent, Object aspect) {
-            setDependencies(dependent, null);
-          }
-  
-          @protected
-          void notifyDependent(covariant InheritedWidget oldWidget, Element dependent) {
-            dependent.didChangeDependencies();
-          }
-  
-          @override
-          void updated(InheritedWidget oldWidget) {
-            if (widget.updateShouldNotify(oldWidget))
-              super.updated(oldWidget);
-          }
-  
-          @override
-          void notifyClients(InheritedWidget oldWidget) {
-            for (final Element dependent in _dependents.keys) {
-              notifyDependent(oldWidget, dependent);
-            }
-          }
+    }
+  ```
+
+  这里做了一件事情就是为_inheritedWidgets这个Map变量赋值,如果在父节点中存在_inheritedWidgets则会合并到这里,如果父节点没有则为_inheritedWidgets赋初始值,键值为widget的runtimeType,value为这个element.
+
+  经过mount一波猛如虎的操作这个InheritedElement就会被挂载到Element Tree中,此时并没有发生什么,接下来就是子节点要在这个代理中注册想要对消息.这个注册方法需要在InheritedElement的widget中手动定义,官方简易的注册写法是这样的
+
+  ```dart
+     static InheritedWidget_Name of(BuildContext context) {
+        return context.dependOnInheritedWidgetOfExactType<InheritedWidget_Name>();
+     }
+  ```
+
+  这个of方法要在子Widget的build中调用来获取InheritedWidget_Name实例,可以通过这个实例拿到存储在InheritedWidget_Name中的状态供子widget使用,但在这个获取实例的过程中会悄悄注册消息订阅事件.
+
+  ```dart
+      @override
+      T dependOnInheritedWidgetOfExactType<T extends InheritedWidget>({Object aspect}) {
+        final InheritedElement ancestor = _inheritedWidgets == null ? null : _inheritedWidgets[T];
+        if (ancestor != null) {
+          return dependOnInheritedElement(ancestor, aspect: aspect) as T;
+        }
+        _hadUnsatisfiedDependencies = true;
+        return null;
       }
+      Set<InheritedElement> _dependencies;
+      @override
+      InheritedWidget dependOnInheritedElement(InheritedElement ancestor, { Object aspect }) {
+        _dependencies ??= HashSet<InheritedElement>();
+        _dependencies.add(ancestor);
+        ancestor.updateDependencies(this, aspect);
+        return ancestor.widget;
+      }
+  ```
+
+  在dependOnInheritedWidgetOfExactType中可以看到子节点拿到了它的代理ancestor并调用了dependOnInheritedElement,这个dependOnInheritedElement调用了代理element的updateDependencies方法并把子element作为参数传入,最后返回代理的widget(这里面存储着子widget需要的data).
+
+  ```dart
+  
+    @protected
+    void updateDependencies(Element dependent, Object aspect) {
+      setDependencies(dependent, null);
+    }
+
+    final Map<Element, Object> _dependents = HashMap<Element, Object>();
+
+    void setDependencies(Element dependent, Object value) {
+      _dependents[dependent] = value;
+    }
+
+  ```
+
+  又可以看到在updateDependencies中调用了setDependencies,这个setDependencies就是为代理中的_dependents赋值,_dependents的key值是子element实例.
+  
+  经过以上步骤就把子Element的实例注册在了InheritedElement中的_dependents属性的keys中.当触发渲染流水线重绘走到element的update函数时,就会调用前面说的在ProxyElement中定义的updated方法,这个方法会被InheritedElement重写
+
+  ```dart
+    @override
+    void updated(InheritedWidget oldWidget) {
+        if (widget.updateShouldNotify(oldWidget))
+            super.updated(oldWidget);
+    }
+  ```
+
+  重写的目的就是加了一层判断,需要开发者根据新旧widget自行判断是否要通知子节点触发didChangeDependencies事件,这个判断是在InheritedWidget中被重写的.如果返回true则会触发notifyClients通知注册的子element调用didChangeDependencies
+
+  ```dart
+     @override
+     void notifyClients(InheritedWidget oldWidget) {
+        for (final Element dependent in _dependents.keys) {
+          notifyDependent(oldWidget, dependent);
+        }
+     }
+
+    @protected
+    void notifyDependent(covariant InheritedWidget oldWidget, Element dependent) {
+        dependent.didChangeDependencies();
+    }
   ```
   
   
