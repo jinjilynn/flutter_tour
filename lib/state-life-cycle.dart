@@ -150,7 +150,7 @@ class _CounterState extends State<Counter> {
   @override
   void didChangeDependencies() {
     print('didChangeDependencies');
-    print('-------------------------------------------------------------');
+    print('------------------------------------------------------------');
     super.didChangeDependencies();
   }
 }
