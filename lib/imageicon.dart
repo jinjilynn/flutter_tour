@@ -7,40 +7,31 @@ class ImageIcons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child:Column(
-        children:<Widget>[
+        child: Column(children: <Widget>[
       Image(
         image: NetworkImage('https://pcdn.flutterchina.club/imgs/3-17.png'),
-        width:60.0,
-        color: Colors.red,
-        colorBlendMode:BlendMode.colorBurn,
+        width: 390.0,
+        height: 100,
+        color: Colors.blue,
+        colorBlendMode: BlendMode.darken,
+        //fit:BoxFit.fitWidth,
         repeat: ImageRepeat.repeatX,
       ),
-      Text(
-        '\uE914',
-        style:TextStyle(
-          fontFamily:'MaterialIcons',
-          color: Colors.black,
-          fontSize: 15.0
-        )
-      ),
+      Text('\uE914',
+          style: TextStyle(
+              fontFamily: 'MaterialIcons',
+              color: Colors.black,
+              fontSize: 90.0)),
       Text(
         '\ue695',
-        style:TextStyle(
-          fontFamily:'gefont',
-          fontSize:30,
-          color:Colors.lightGreen
-        ),
+        style: TextStyle(
+            fontFamily: 'gefont', fontSize: 90, color: Colors.lightGreen),
       ),
-        Icon(IconData(
-          0xeb81,
-          fontFamily: 'gefont'
-        ),
-        color:Colors.blue,
-        size:20
-        ),
-        ]
-      )
-    );
+      Icon(
+          IconData(0xeb81, fontFamily: 'gefont'),
+          color: Colors.blue, 
+          size: 90
+      ),
+    ]));
   }
 }

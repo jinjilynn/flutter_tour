@@ -37,6 +37,7 @@ class _RadioButtonDemoState extends State<RadioButtonDemo> {
           groupValue: _value,
           onChanged: (v) {
             setRadio(v);
+            print(v);
           }),
       Radio(
           value: '香蕉',
@@ -51,7 +52,8 @@ class _RadioButtonDemoState extends State<RadioButtonDemo> {
             setfRadio(v);
           },
           title: Text('Flutter'),
-          secondary: Icon(Icons.people))
+          //secondary: Icon(Icons.people)
+          )
     ]));
   }
 }

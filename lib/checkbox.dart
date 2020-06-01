@@ -9,17 +9,21 @@ class CheckBoxDemos extends StatefulWidget {
 
 class _CState extends State<CheckBoxDemos> {
   String t = '未选中';
-  bool _c = false;
+  dynamic _c;
   @override
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
-        Checkbox(value: this._c,tristate:true, onChanged: (v){
-          setState(() {
-            this.t = v ? '选中' : '未选中';
-            this._c = null;
-          });
-        }),
+        Checkbox(
+            value: _c,
+            tristate: true,
+            onChanged: (v) {
+              setState(() {
+                //this.t = v ? '选中' : '未选中';
+                print(v);
+                this._c = v;
+              });
+            }),
         Text('$t')
       ],
     );

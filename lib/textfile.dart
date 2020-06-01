@@ -9,8 +9,9 @@ class TextFieldDemo extends StatefulWidget {
 }
 
 class _TextFieldDemoState extends State<TextFieldDemo> {
+    FocusNode _fnode2 = FocusNode();
   FocusNode _fnode1 = FocusNode();
-  FocusNode _fnode2 = FocusNode();
+
   //FocusNode _fnode2 = FocusNode();
   String _t = 'undone';
   Color _bc = Colors.yellow;
@@ -51,16 +52,16 @@ class _TextFieldDemoState extends State<TextFieldDemo> {
         children: <Widget>[
           Text('$_t'),
           TextField(
+              keyboardType:TextInputType.multiline,
               controller: _controller,
               focusNode: _fnode1,
               autofocus: false,
               //obscureText:true,
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.send,
+              textInputAction: TextInputAction.search,
               textAlign: TextAlign.left,
-              maxLines: 1,
-              maxLength: 190,
-              maxLengthEnforced: true,
+              maxLines: null,
+              // maxLength: 150,
+              // maxLengthEnforced: true,
               cursorWidth: 3.0,
               cursorColor: Colors.blue,
               cursorRadius: Radius.circular(30),
@@ -86,7 +87,6 @@ class _TextFieldDemoState extends State<TextFieldDemo> {
                 prefixText: '姓名:',
                 fillColor: this._bc,
                 filled: true,
-                hoverColor: Colors.red,
                 //prefixStyle: TextStyle(color: Color.fromRGBO(20, 20, 20, 0.7)),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.grey),

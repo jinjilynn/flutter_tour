@@ -986,122 +986,99 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
 
 ### Widget
 
-- 基础widget定义在widgets.dart中,Meterial和Cupertino中都可以使用的
-
-  - Text
-  - Image
-  - Icon
-  - Form
-  - Row
-  - Column
-  - Flex
-  - Wrap
-  - Stack
-  - ConstrainedBox
-  - UnconstrainedBox
-  - DecoratedBox
-  - Transform
-  - Align
-  - Container
-
 - 文本
-  
+
   - from widgets.dart
-  
+
   - 创建一个带格式的文本
-  
+
   - 类:Text
-  
+
   - 默认fontSize为14
-  
-  - 如果没有显式或明确设置constraints,则Text盒子的宽高就是内容宽高
-  
-    - 常用参数
-  
-      - "xxx" 
-        - 必填参数
-        - 类型: String
-      - textAlign：
-        - 可选参数
-        - 类型: TextAlign
-        - 文本的对齐方式,对齐的参考系是Text widget本身 
-      - maxLines: 
-        - 可选参数
-        - 类型:  int
-        - 文本显示的最大行数,默认情况下，文本是自动折行的
-      - overflow
-        - 可选参数
-        - 类型:TextOverflow
-          - ellipsis
-        - 需要配合maxLines使用的,当到文本达到最大行数时,指定的截断方式,默认是直接截断
-      - textScaleFactor:
-        - 可选参数
-        - 类型:double
-        - 文本相对于当前字体大小的缩放因子,相当于style里fontSize的快捷方式
-      - style
-        - 可选参数
-        - 类型: TextStyle
-          - color
-            - 文字颜色
-            - 类型:Color
-          - fontSize 
-            - 文字大小
-            - 类型:double
-          - height 
-            - 类型:double
-            - 该属性用于指定行高，但它并不是一个绝对值，而是一个因子，具体的行高等于`fontSize`*`height`
-          - fontFamily
-            - 指定字体
-            - 类型:String
-          - background
-            - 文字行背景
-            - 类型:Paint
-          - decoration
-            - 下划线等
-            - 类型:TextDecoration
-        - decorationStyle
-            - 横线的样式
-          - 类型:TextDecorationStyle
-  
-    - Text.rich
-  
-      - 命名构造函数rich,可以创建富文本,也就是可以是文本内容的不同部分按照不同的样式显示
+
       - 常用参数
-        - textSpan
+
+        - "xxx" 
           - 必填参数
-          - 类型:TextSpan
+          - 类型: String
+        - textAlign：
+          - 可选参数
+          - 类型: TextAlign
+          - 文本的对齐方式,对齐的参考系是Text widget本身 
+        - maxLines: 
+          - 可选参数
+          - 类型:  int
+          - 文本显示的最大行数,默认情况下，文本是自动折行的
+        - overflow
+          - 可选参数
+          - 类型:TextOverflow
+            - ellipsis
+          - 需要配合maxLines使用的,当到文本达到最大行数时,指定的截断方式,默认是直接截断
+        - textScaleFactor:
+          - 可选参数
+          - 类型:double
+          - 文本相对于当前字体大小的缩放因子,相当于style里fontSize的快捷方式
+        - style
+          - 可选参数
+          - 类型: TextStyle
+            - color
+              - 文字颜色
+              - 类型:Color
+            - fontSize 
+              - 文字大小
+              - 类型:double
+            - height 
+              - 类型:double
+              - 该属性用于指定行高，但它并不是一个绝对值，而是一个因子，具体的行高等于`fontSize`*`height`
+            - fontFamily
+              - 指定字体
+              - 类型:String
+            - background
+              - 文字行背景
+              - 类型:Paint
+            - foreground
+              - 文字颜色
+              - 类型:Paint 与 color一样的效果,但不能同时存在
+            - decoration
+              - 下划线等
+              - 类型:TextDecoration
+            - decorationStyle
+                - 横线的样式
+              - 类型:TextDecorationStyle
+
+      - Text.rich
+
+        - 命名构造函数rich,可以创建富文本,也就是可以是文本内容的不同部分按照不同的样式显示
+        - 常用参数
+          - textSpan
             - text
-          - style
             - children
-            - 可以再包含TextSpan
-  
+
+            - style
+
   - 关于使用自定义的字体
-  
+
       - 在pubspec.yaml中声明资源
-  
+
         - ```yaml
           flutter:
             fonts:
-              - family: Raleway
+              - family: myfont
                 fonts:
                   - asset: assets/fonts/Raleway-Regular.ttf
                   - asset: assets/fonts/Raleway-Medium.ttf
                     weight: 500
-                  - asset: assets/fonts/Raleway-SemiBold.ttf
-                    weight: 600
-              - family: AbrilFatface
-              fonts:
-                  - asset: assets/fonts/abrilfatface/AbrilFatface-Regular.ttf
+                    style: italic
           ```
-      
+        
       - 在TextStyle中使用
       
         - ```dart
           const textStyle = const TextStyle(
-          fontFamily: 'Raleway',
+          	fontFamily: 'myfont',
           );
           ```
-  
+
 - DefaultTextStyle
   
     - 一个提供默认样式的Widget,里面定义的样式可以被其中所有的子元素继承
@@ -1143,7 +1120,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
         - colorBrightness 按钮主题
           - 主题分为深浅可以改变内容文字的颜色,以使文字显得明显
           - 类型 Brightness
-        - padding 按钮那边距
+        - padding 按钮内边距
         - shape 按钮形状
           - 类型 ShapeBorder
         - onPressed 如果不提供该回调则按钮会处于禁用状态，禁用状态不响应用户点击
@@ -1156,7 +1133,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
           - 类型 Color 设置按钮背景颜色
         - onPressed
     - FlatButton
-      - 说明:默认背景透明并不带阴影。按下时，会有背景色
+      - 说明:一个可点击的label,默认背景透明并不带阴影。按下时，会有背景色.
       - 参数
         - child
           - 类型: Widget 一般为Text
@@ -1164,7 +1141,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
           - 类型Color
         - onPressed
     - OutlineButton
-      - 说明: 默认有一个边框，不带阴影且背景透明。按下时，边框颜色会变亮、同时出现背景和阴影(较弱)
+      - 说明: 一个可点击的label,默认有一个边框，不带阴影且背景透明。按下时，边框颜色会变亮、同时出现背景和阴影(较弱)
       - 参数
         - child
           - 类型: Widget 一般为Text
@@ -1185,13 +1162,12 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
         - icon
           - 类型 Icon
         - color
-        - icon颜色
           - 类型 Color
-      - onPressed
-    
-  - 图片
+        - onPressed
+      
+    - 图片
   
-    - 加载并显示图片，图片的数据源可以是asset、文件、内存以及网络
+    - 加载并显示图片，图片的数据源可以是asset、file、memory、network.
     - Flutter框架对加载过的图片是有缓存的（内存），默认最大缓存数量是1000张，最大缓存空间为100M
     - 类:Image
     - from widgets.dart
@@ -1211,11 +1187,13 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
           - 可以调用命名构造函数简写为Image.network()
       - width
         - 图片宽度
+        - 只会在长度小于等于图片实际宽度才会控制图片
         - 类型 double
         - 只设置`width`、`height`的其中一个，那么另一个属性默认会按比例缩放
         - 不指定宽高时，图片会根据当前父容器的限制，尽可能的显示其原始大小
       - height
         - 图片高度
+        - 只会在长度小于等于图片实际高度才会控制图片
         - 类型 double
         - 只设置`width`、`height`的其中一个，那么另一个属性默认会按比例缩放
         - 不指定宽高时，图片会根据当前父容器的限制，尽可能的显示其原始大小
@@ -1254,9 +1232,9 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
         - color
           - 指定图标颜色
           - 类型 Color
-      - size
-          - 指定图标大小
-        - 类型 double
+        - size
+            - 指定图标大小
+          - 类型 double
     
     - 字体图标也可以Text中使用
     
@@ -1289,10 +1267,10 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
           - 表示是否选中的值
           - 必填
           - 类型 bool
-        - onChanged
-        - 状态改变回调函数
-          - 必填
-        - 类型 ValueChanged<bool>   typefrom: Function(T value)
+        -  onChanged
+           - 状态改变回调函数
+             -  必填
+           - 类型 ValueChanged<bool>   typefrom: Function(T value)
   
   - 单选框
   
@@ -1323,21 +1301,21 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
   - 复选框
   
     - from material.dart
-  - 类 CheckBox
-      - 大小不能定义
-      - 参数
-        - value
-          - 表示是否选中的值
-          - 必须
-          - 类型 bool
-        - onChanged
-          - 状态改变的回掉
-          - 必填
-          - 类型 ValueChanged<bool>   typefrom: Function(T value)
-        - tristate
-          - 是否开启第三种状态 即 一条横线
-          - value为null时
-  
+    - 类 CheckBox
+        - 大小不能定义
+        - 参数
+          - value
+            - 表示是否选中的值
+            - 必须
+            - 类型 bool
+          - onChanged
+            - 状态改变的回掉
+            - 必填
+            - 类型 ValueChanged<bool>   typefrom: Function(T value)
+          - tristate
+            - 如果为true则onChanged返回的value会是true false null中
+            - 当为null时会显示破折号
+    
   - 输入框
   
     - From material.dart
