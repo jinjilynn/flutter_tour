@@ -855,7 +855,7 @@ abstract class ProxyElement extends ComponentElement {
 
   这是一个需要子类覆写的方法,通过名字可以看出它是一个实现了类似于消息通知的方法.
 
-  从这个方法可以看出ProxyElement存在的意义和为什么叫ProxyElement了,这个Element就是一个代理、一个不赚差价的中间商,所有的子节点都可以订阅或修改消息,它负责分发消息给对应的子节点.
+  从这个方法可以看出ProxyElement存在的意义和为什么叫ProxyElement了,这个Element就是一个代理、一个不赚差价的中间商,它本身并不生产widget,它只是child属性搬运工.它的子widget并不是使用它的widget.build方法创造出来的,而是在被实例化的时候传入的child属性,所有的子节点都可以订阅或修改消息,它负责分发消息给对应的子节点.
 
 因为ProxyElement是个抽象类,是不能被实例化的,所以会使用到它的两个子类:
 
@@ -966,24 +966,15 @@ abstract class ProxyElement extends ComponentElement {
     }
   ```
   
-  
+
+以上就是ComponentElement的三种类型,ComponentElement存在的意义就是创建子节点,如果Flutter只使用ComponentElement那么在屏幕中是什么也不会看到的,会在内存中建立一个无穷尽的Element树,直到内存溢出或报错,因为每个ComponentElement一定会有build方法返回一个不能为空的子节点widget.所以这个ComponentElement树的每个分支一定要有个尽头,这个尽头就是RenderObjectElement.
+
+#### RenderObjectElement
+
+RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功能也是可以产生树结构的,只是它的子节点不但可以是child还可以是children,而ComonentElement只有child.其次,RenderObjectElement是一个有布局、有样式、有画面的Element,因为每个RenderObjectElement都有一个属性来持有RenderObject,这个RenderObject就是最终要被渲染的东西,而且由于ComponentElement的存在,会导致Element树和Render树上的节点并不是一一对应的.所以RenderObjectElement中存在渲染逻辑不但要完成树的构建还要把RenderObject的变化同步到Render Tree中.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##### TO BE CONTINUED...
 
 
 
