@@ -11,15 +11,15 @@ class _StackDemoState extends State<StackDemo> {
   @override
   Widget build(BuildContext context) {
     return  Stack(
-      alignment: AlignmentDirectional.topCenter,
+      alignment: AlignmentDirectional.topStart,
       textDirection: TextDirection.rtl,
       fit: StackFit.loose,
       overflow:Overflow.visible,
       children: <Widget>[
         Container(height:700,width:414,color:Colors.black),
-        Positioned(width:80,child: Container(width:80,height:80,color:Colors.pink),bottom:-30),
-        Positioned(child:Container(height:30,width:100,color:Colors.red),top:0),
         Container(height:60,width:60,color:Colors.blue),
+        Positioned(width:200,top:0,left:0,child:Container(height:30,width:100,color:Colors.red)),
+        Positioned(width:80,child: Container(color:Colors.pink),top:60,bottom:30),
       ],
     );
   }

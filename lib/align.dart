@@ -5,16 +5,16 @@ class AlignDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return Align(
-    //         heightFactor: 3,
-    //         alignment: Alignment(1,0),
-    //         child: Container(
-    //             width: 80,
-    //             height: 80,
-    //             decoration: BoxDecoration(
-    //                 color: Colors.red,
-    //                 border: Border.all(color: Colors.black))));
-    return Container(
+    return Align(
+            //heightFactor: 3,
+            alignment: Alignment(0,1),
+            child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                    color: Colors.red,
+                    border: Border.all(color: Colors.black))));
+    Container(
         width: 280,
         height: 500,
         color: Colors.lightBlue,

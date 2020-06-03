@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/decoratedbox.dart';
 //import 'package:flutter/widgets.dart';
 
 class ButtonDemo extends StatelessWidget {
@@ -21,12 +22,10 @@ class ButtonDemo extends StatelessWidget {
       ),
       //MaterialButton
       MaterialButton(
-        child: Text("outline"),
+        child: DecoratedBoxDemo(),
         color: Colors.orange,
         onPressed: () {},
         padding: EdgeInsets.all(0),
-        height:90,
-        minWidth:9000,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       ),
@@ -35,8 +34,7 @@ class ButtonDemo extends StatelessWidget {
           color: Colors.yellow,
           onPressed: () => {}),
       RaisedButton.icon(
-          onPressed: () {}, icon: Icon(Icons.score), label: Text('iconbutton')
-      ),
+          onPressed: () {}, icon: Icon(Icons.score), label: Text('iconbutton')),
       Image(
         image: AssetImage('images/chrome.png'),
         width: 60.0,

@@ -5,23 +5,23 @@ class ConstrainedBoxDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-        constraints: BoxConstraints(minWidth: double.infinity, minHeight: 500),
-        child: greedBox);
-  }
-}
+    return blueBox;
+    // return ConstrainedBox(
+    //     constraints: BoxConstraints(minWidth: double.infinity, minHeight: 10),
+    //     child: ConstrainedBox(constraints: BoxConstraints(maxWidth:300,maxHeight:20),child:pinkBox));
+    // }
+}}
 
 Widget greedBox = DecoratedBox(
-    child: blueBox, decoration: BoxDecoration(color: Colors.lightGreen));
-// Widget blueBox = UnconstrainedBox(
-//   child: DecoratedBox(
-//   decoration: BoxDecoration(color: Colors.lightBlue)
-//   )
-// );
+  child:ConstrainedBox(constraints: BoxConstraints(maxWidth:300,maxHeight:200),child:pinkBox),
+  decoration: BoxDecoration(color: Colors.lightGreen)
+);
+Widget pinkBox = DecoratedBox(decoration: BoxDecoration(color: Colors.green));
+
 
 Widget blueBox = UnconstrainedBox(
     //constrainedAxis: Axis.horizontal,
-    alignment: Alignment.topCenter,
+    alignment: Alignment.topRight,
     child: DecoratedBox(
         child: Text('data'),
         decoration: BoxDecoration(color: Colors.lightBlue))
