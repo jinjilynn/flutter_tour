@@ -1104,7 +1104,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
       ],
   ),
   )
-    ```
+  ```
 
 #### 按钮
 
@@ -1562,7 +1562,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
     - Form.of
       - of一般是是获取statefullwidget的state对象的约定方法,参数为context
     - GlobalKey
- 
+
 ### 布局✨
 
 布局类组件就是指直接或间接继承(包含)`MultiChildRenderObjectWidget`的Widget，它们一般都会有一个`children`属性用于接收子Widget
@@ -1586,7 +1586,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
   - CrossAxisAlignment
     
 ##### Row
-    
+
 - from widgets.dart
 - 和Expanded配合使用可以实现弹性布局
 - 水平方向上的线形布局,主轴为水平方向,辅轴为垂直方向
@@ -1653,7 +1653,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
     - 默认值
       
           - Down 
-          
+      
 ##### Column
 - from widgets.dart
 - 和Expanded配合使用可以实现弹性布局
@@ -1693,11 +1693,11 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
         - Widget
     
 #### 流式布局
-  
+
 - 超出屏幕显示范围会自动折行的布局
   
 ##### Wrap
-  
+
 - from widgets.dart
 - Wrap也有主轴和辅轴之分,水平方向布局的话,主轴就是水平方向,辅轴就是垂直方向,反之,亦然.
 - run概念
@@ -1776,13 +1776,13 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
     - List<Widget>
     
 ##### Flow
-    
+
 - from widgets.dart
 - 自定义实现布局
 - 过于复杂,暂时略...
-    
-#### 绝对定位
   
+#### 绝对定位
+
 - 类 Stack
 
 - from widgets.dart
@@ -2223,7 +2223,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
     -   以上这些只是对transform属性赋特殊的值给Matrix4
     
 #### 裁剪
-  
+
 - 用于对组件进行裁剪
 - from widgets.dart
 - ClipOval
@@ -2235,7 +2235,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
 - 每个Clip都有一个clip参数,该参数可以自定义裁剪区域
 
 #### Container
-    
+
 - from widgets.dart
 - Container组件是一个组合容器,并没有自己的renderObject,类似于把ConstrainedBox、DecoratedBox、Transform、Padding、Align、Clip等放到一起的自定义组件
 - 参数
@@ -2251,5 +2251,119 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
   - transform
   - child
   - chlipBehavior
-    
-      
+
+### 滚动✨
+
+#### SingleChildScrollView
+
+没有延迟加载的scroll,会对一个单节点的child长内容实现滚动效果
+
+参数:
+
+- scrollDirection
+
+  - 滚动的方向
+  - Axis
+    - vertical
+    - horizontal
+
+- reverse
+
+  - 是否沿读取方向滚动,就是是否是反向滚动
+  - bool
+
+- padding
+
+  - child周围的padding
+
+- primary
+
+  - 是否使用父节点的PrimaryScrollController
+  - 为true时不能再自己设置controller
+
+- physics
+
+  - 设置滚动动画效果
+  - 默认和平台匹配
+
+- controller
+
+  - 主要用来控制滚动位置,以及页面切换是否保留滚动的位置
+
+- child
+
+  - 需要展示的child
+
+#### ListView
+
+线性展示一个可滚动的子组件列表,子组件可以懒加载
+
+ListView默认构造函数的属性:
+- scrollDirection
+- reverse
+- controller
+- primary
+- physics
+- padding
+
+以上属性和SingleChildScrollView含义相同
+
+- shrinkWrap
+  - ListView的延伸是否由其children来决定
+  - bool
+  - 默认 false
+- itemExtent
+  - 设置每个child在滚动方向上的延伸
+  - double
+- addAutomaticKeepAlives
+  - 当child滚出屏幕时是否避免被垃圾回收机制回收
+  - bool
+  - 默认true
+- addRepaintBoundaries
+  - 当list滚动时是否避免children重绘
+  - bool
+  - 默认true
+- children
+
+直接调用ListView默认构造函数时并没有懒加载的功效,和SingleChildScrollView没有啥区别.
+
+所以如果需要懒加载效果,可以调用命名构造函数 ListView.builder
+
+ ListView.builder的参数
+
+- scrollDirection
+- reverse
+- controller
+- primary
+- physics
+- padding
+- shrinkWrap
+- itemExtent
+- addAutomaticKeepAlives
+- addRepaintBoundaries
+
+以上参数和默认构造函数的参数意义相同
+
+- itemBuilder 
+  - 用来构建子child的函数
+  - Function
+  - typedef:  Widget Function(BuildContext context, int index)
+- itemCount
+  - 设置子组件的个数,也就是itemBuilder要调用几次
+  - 为null时表示无限列表
+  - int
+
+还可以调用ListView.separated
+
+这个构造函数是在builder之上的一层包装,多了一个在item之间的分割builder
+
+- separatorBuilder
+  - 构造分割widget
+  - Function
+  - typedef:  Widget Function(BuildContext context, int index)
+
+#### GridView
+
+
+
+​      

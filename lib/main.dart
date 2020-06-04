@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/GridView.dart';
+import 'package:flutter_demo/ListView.dart';
+import 'package:flutter_demo/SingleChildScrollView.dart';
 import 'package:flutter_demo/state-life-cycle.dart';
 import 'package:flutter_demo/clip.dart';
 import 'package:flutter_demo/constrainedBox.dart';
@@ -41,7 +44,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: ClipDemo()),
+      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: GridViewDemo()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }
