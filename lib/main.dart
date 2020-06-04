@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: ButtonDemo()),
+      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: ClipDemo()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }

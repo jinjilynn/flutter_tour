@@ -9,7 +9,7 @@ class ClipDemo extends StatelessWidget {
         img,
         ClipOval(child:img),
         ClipRRect(child:img, borderRadius: BorderRadius.circular(20),),
-        Container(child:ClipRect(child:UnconstrainedBox(child: img),),width:400,height:200)
+        //Container(child:ClipRect(child:UnconstrainedBox(child: img),),width:400,height:200)
       ],),
     );
   }
