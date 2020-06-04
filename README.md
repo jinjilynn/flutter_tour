@@ -983,9 +983,9 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
 因为布局算法为clamp,所以非tight的布局容器无法直接定义宽高
 
 
-#### Basic Widget
+### 基础✨
 
-##### 文本
+#### 文本
 
 - from widgets.dart
 
@@ -1078,7 +1078,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
       );
       ```
 
-###### DefaultTextStyle
+##### DefaultTextStyle
 
 - 一个提供默认样式的Widget,里面定义的样式可以被其中所有的子元素继承
 
@@ -1106,7 +1106,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
   )
     ```
 
-##### 按钮
+#### 按钮
 
 - 关于
   - from material.dart
@@ -1164,7 +1164,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
       - 类型 Color
     - onPressed
   
-##### 图片
+#### 图片
 
 - 加载并显示图片，图片的数据源可以是asset、file、memory、network.
 - Flutter框架对加载过的图片是有缓存的（内存），默认最大缓存数量是1000张，最大缓存空间为100M
@@ -1214,50 +1214,48 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
     - 图片本身大小小于显示空间时，指定图片的重复规则
   - 类型 ImageRepeat
 
-##### 字体图标
+#### 字体图标
+- 类: Icon
 
-  - 类: Icon
+  - from widgets.dart
+  - 参数
+    - icon
+      - 指定字体图标
+      - 类型 IconData
+        - 参数
+          - codePoint
+            - 类型 int 16进制的
+          - fontFamily
+            - 类型 String
+    - color
+      - 指定图标颜色
+      - 类型 Color
+    - size
+        - 指定图标大小
+      - 类型 double
 
-    - from widgets.dart
-    - 参数
-      - icon
-        - 指定字体图标
-        - 类型 IconData
-          - 参数
-            - codePoint
-              - 类型 int 16进制的
-            - fontFamily
-              - 类型 String
-      - color
-        - 指定图标颜色
-        - 类型 Color
-      - size
-          - 指定图标大小
-        - 类型 double
+- 字体图标也可以Text中使用
 
-  - 字体图标也可以Text中使用
+- 在Text中使用
+    - Text第一个参数需要传递一个16进制的字符码 (String形式的\u开头)
+  - style参数里的fontFamily需要设置为相应字体
 
-  - 在Text中使用
-      - Text第一个参数需要传递一个16进制的字符码 (String形式的\u开头)
-    - style参数里的fontFamily需要设置为相应字体
+- 可以使用Material Design的字体图标
 
-  - 可以使用Material Design的字体图标
+- 可以使用自定义图标
 
-  - 可以使用自定义图标
+- 需要在pubspec.yaml文件中配置
 
-  - 需要在pubspec.yaml文件中配置
-
-    - ```yaml
+  - ```yaml
+    fonts:
+      - family: myIcon  #指定一个字体名
       fonts:
-        - family: myIcon  #指定一个字体名
-        fonts:
-            - asset: fonts/iconfont.ttf
-      ```
+          - asset: fonts/iconfont.ttf
+    ```
 
-  - 在fontFamily中指定相应的字体
+- 在fontFamily中指定相应的字体
 
-##### 开关
-
+#### 开关
 - from material.dart
 - 类 Switch
   - 不能定义大小
@@ -1271,8 +1269,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
           -  必填
         - 类型 ValueChanged<bool>   typefrom: Function(T value)
 
-##### 单选框
-
+#### 单选框
 - from material.dart
 - 类 Radio<T>
   - 参数
@@ -1297,8 +1294,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
       - 类型 Widget 比如Icon
       - 在Radio后面设置相关的Icon等
 
-##### 复选框
-
+#### 复选框
 - from material.dart
 - 类 CheckBox
     - 大小不能定义
@@ -1315,8 +1311,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
         - 如果为true则onChanged返回的value会是true false null中
         - 当为null时会显示破折号
 
-##### 输入框
-
+#### 输入框
 - From material.dart
 - 类 TextField
   - 常用可选参数
@@ -1536,8 +1531,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
       - 光标颜色
       - 类型 Color
 
-##### Form表单
-
+#### Form表单
 - From widgets.dart
 - 可以对继承了FormField的子孙组件进行统一的处理,比如校验、重置、内容保存等
 - 参数
@@ -1569,11 +1563,11 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
       - of一般是是获取statefullwidget的state对象的约定方法,参数为context
     - GlobalKey
  
-#### 布局Widgets
+### 布局✨
 
 布局类组件就是指直接或间接继承(包含)`MultiChildRenderObjectWidget`的Widget，它们一般都会有一个`children`属性用于接收子Widget
 
-##### 线性布局
+#### 线性布局
 
 - 超出屏幕显示范围不会自动折行的布局
 
@@ -1591,7 +1585,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
 
   - CrossAxisAlignment
     
-###### Row
+##### Row
     
 - from widgets.dart
 - 和Expanded配合使用可以实现弹性布局
@@ -1660,7 +1654,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
       
           - Down 
           
-###### Column
+##### Column
 - from widgets.dart
 - 和Expanded配合使用可以实现弹性布局
 - 垂直方向上的线形布局,主轴为垂直方向,辅轴为水平方向
@@ -1669,7 +1663,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
 - 参数 
       - 同 Row的参数
   
-###### Flex 
+##### Flex 
 - from widgets.dart
 - Expanded配合使用来实现弹性布局
 - 弹性布局允许子组件按照一定比例来分配父容剩余的器空间
@@ -1886,13 +1880,13 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
   - 没有指定到的定位属性会被alignment相应方向上的值覆盖
   - 不能同时指定left、width、right这三个参数
   
-#### 样式Widget
+### 样式✨
 
 有很多子节点的一般就是布局使用的,只有一个子节点的那就是只和这个子节点有关的,即样式.
 
 渲染子节点样式的widget继承自SingleChildRenderObjectWidget
 
-##### 对齐方式
+#### 对齐
 
 - from widgets.dart
   
@@ -1903,7 +1897,6 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
 - 里面的子组件如果溢出了的话不会报错,益处的部分不会被截取掉
 
 - 参数
-
     - alignment
         - 设置子元素的对齐方式
         - 类型
@@ -1943,7 +1936,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
 
       - 就是alignment设置为center的快捷方式
 
-##### 内边距
+#### 边距
 - 类 Padding
 - from widgets.dart
     - 为其子节点添加padding
@@ -1973,7 +1966,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
     - child
       - 子元素
     
-##### 约束
+#### 约束
 - 类  ConstrainedBox
 - from widgets.dart
 - 所有可视的widget都必定会有一个盒约束
@@ -2012,7 +2005,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
       - SizeBox
         - 一种特殊情况,相当于BoxConstraints.tight
     
-##### 取消继承约束
+#### 取消继承约束
 - 类 UnconstrainedBox
 - from widgets.dart
 - 取消子元素中从父节点及以上继承下来的盒约束
@@ -2041,7 +2034,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
         - horizontal
       - vertical
   
-##### 盒子样式
+#### 背景、边框、阴影
 - 类 DecoratedBox
 
 - from widgets.dart
@@ -2158,7 +2151,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
         - background
           - foreground
     
-##### 变形
+#### 变形
 -   类 Transform
 -   from widgets.dart
 -   对其子元素进行变形
@@ -2229,7 +2222,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
     -   Transform.rotate
     -   以上这些只是对transform属性赋特殊的值给Matrix4
     
-##### 裁剪
+#### 裁剪
   
 - 用于对组件进行裁剪
 - from widgets.dart
@@ -2241,7 +2234,7 @@ RenderObjectElement是比较复杂的,首先它也具有ComponentElement的功�
   - 剪裁子组件到实际占用的矩形大小（溢出部分剪裁）
 - 每个Clip都有一个clip参数,该参数可以自定义裁剪区域
 
-##### Container
+#### Container
     
 - from widgets.dart
 - Container组件是一个组合容器,并没有自己的renderObject,类似于把ConstrainedBox、DecoratedBox、Transform、Padding、Align、Clip等放到一起的自定义组件
