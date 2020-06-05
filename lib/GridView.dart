@@ -9,11 +9,10 @@ class GridViewDemo extends StatefulWidget {
 
 class _GridViewDemoState extends State<GridViewDemo> {
 
-  List<IconData> _icons = []; //保存Icon数据
+  List<IconData> _icons = [];
 
   @override
   void initState() {
-    // 初始化数据  
     _retrieveIcons();
   }
 
@@ -21,12 +20,11 @@ class _GridViewDemoState extends State<GridViewDemo> {
   Widget build(BuildContext context) {
     return GridView.builder(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 100, //每行三列
-            childAspectRatio: 1.0 //显示区域宽高相等
+            maxCrossAxisExtent: 100, 
+            childAspectRatio: 1.0
         ),
         itemCount: _icons.length,
         itemBuilder: (context, index) {
-          //如果显示到最后一个并且Icon总数小于200时继续获取数据
           if (index == _icons.length - 1 && _icons.length < 200) {
             _retrieveIcons();
           }
@@ -34,8 +32,6 @@ class _GridViewDemoState extends State<GridViewDemo> {
         }
     );
   }
-
-  //模拟异步获取数据
   void _retrieveIcons() {
     Future.delayed(Duration(milliseconds: 200)).then((e) {
       setState(() {

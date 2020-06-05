@@ -2313,7 +2313,7 @@ ListView默认构造函数的属性:
   - bool
   - 默认 false
 - itemExtent
-  - 设置每个child在滚动方向上的延伸
+  - 强行设置每个child在滚动方向上的延伸
   - double
 - addAutomaticKeepAlives
   - 当child滚出屏幕时是否避免被垃圾回收机制回收
@@ -2363,6 +2363,92 @@ ListView默认构造函数的属性:
   - typedef:  Widget Function(BuildContext context, int index)
 
 #### GridView
+
+前两个View都是线性布局的滚动,要实现流式布局的滚动要用GridView
+
+参数:
+
+- scrollDirection
+- reverse
+- controller
+- primary
+- physics
+- padding
+- shrinkWrap
+- children
+- addAutomaticKeepAlives
+- addRepaintBoundaries
+
+以上参数和ListView中的含义相同
+
+- gridDelegate
+
+  - 实现流式布局的方式
+
+  - SliverGridDelegate
+
+    - SliverGridDelegateWithFixedCrossAxisCount
+
+      - 限制了每条辅轴方向上子元素的个数
+      - 参数
+        - crossAxisCount
+          - 辅轴上的个数
+        - childAspectRatio
+          - 子元素在辅轴方向和主轴方向上长度的比例关系
+        - mainAxisSpacing
+          - 每个子元素在主轴方向上的padding
+        - crossAxisSpacing
+          - 每个子元素在辅轴方向上的padding
+
+    - SliverGridDelegateWithMaxCrossAxisExtent
+
+      - 在辅轴方向上给child一个最大值,在保证辅轴被平分的情况下使child在辅轴方向上的长度尽可能的接近那个最大值
+
+      - 参数
+
+        - maxCrossAxisExtent那个最大值
+        - mainAxisSpacing
+        - crossAxisSpacing
+        - childAspectRatio
+
+        含义同上
+
+调用方法
+- GridView.builder
+- GridView.count
+- GridView.extent
+
+#### CustomScrollView
+
+非常有用,详见源码说明
+
+#### About Controller
+
+一个ScrollController对象可以同时被多个可滚动组件使用，ScrollController会为每一个可滚动组件创建一个ScrollPosition对象，这些ScrollPosition保存在ScrollController的positions属性中
+
+initialScrollOffset
+keepScrollOffset
+
+offset
+jumpTo / animateTo
+
+addListener
+
+### 异步构建✨
+
+#### FutureBuilder
+
+#### StreamBuilder
+
+### Theme✨
+
+### Dialog✨
+
+#### AlertDialog
+
+#### SimpleDialog
+
+### 路由✨
 
 
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/CustomerScrollView.dart';
 import 'package:flutter_demo/GridView.dart';
 import 'package:flutter_demo/ListView.dart';
 import 'package:flutter_demo/SingleChildScrollView.dart';
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: GridViewDemo()),
+      home: Scaffold(appBar: AppBar(title: Text('Learning')), body: CustomScrollViewDemo()),
       // theme: ThemeData(primarySwatch: Colors.lightBlue)
     );
   }
